@@ -28,7 +28,8 @@ BattleshipsOnline.iml
 ## Plugin-specific files:
 
 # IntelliJ
-out/
+/out/
+*.class
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
