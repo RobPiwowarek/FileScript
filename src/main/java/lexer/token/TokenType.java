@@ -1,6 +1,7 @@
 package lexer.token;
 
 public enum TokenType {
+    VAR, // todo
     INT, BOOL, STRING, FILE, CATALOGUE,
     ASSIGN_OP,
     RELATIONAL_OP,
