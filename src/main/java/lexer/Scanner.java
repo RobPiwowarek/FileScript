@@ -7,67 +7,42 @@ import lexer.token.TokenType;
 import java.io.*;
 import java.util.HashMap;
 
+// fixme: moglbym wszystkiemu dac sprawdzenie czy nie ma juz EOF
 public class Scanner {
-    private HashMap<String, TokenType> keywordsTable;
+    private HashMap<String, Token> keywordsTable;
 
-    private InputStream source;
-
-    private int charCounter = 1, lineCounter = 1;
+    private Source source;
 
     public Scanner() {
         initializeKeywords();
 
-        source = System.in;
+        source = new Source(System.in);
     }
 
     public Scanner(File fileSource) {
         initializeKeywords();
 
-        try {
-            source = new FileInputStream(fileSource);
-        } catch (FileNotFoundException e) {
-            System.out.println("Could not find file for scanner source");
-            throw new RuntimeException(e);
-        }
+        source = new Source(fileSource);
     }
-
-    private char getNextChar() {
-        try {
-            char nextChar = (char) source.read();
-
-            if (nextChar == '\n') {
-                ++lineCounter;
-
-                charCounter = 1;
-
-                return getNextChar();
-            } else {
-                ++charCounter;
-
-                return nextChar;
-            }
-
-        } catch (IOException e) {
-            System.out.println("Could not read from source");
-            throw new RuntimeException(e);
-        }
-    }
-
 
     private Token getNextToken() {
-        char currentChar = getNextChar();
+        char currentChar = source.nextChar();
         Token token;
 
-        while (Character.isWhitespace(currentChar))
-            currentChar = getNextChar();
+        while (Character.isWhitespace(source.peek()) || Character.isWhitespace(currentChar))
+            currentChar = source.nextChar();
 
         if (Character.isDigit(currentChar))
-            token = processNumber(currentChar);
+            token = processNumberOrDate(currentChar);
         else if (Character.isLetter(currentChar))
             token = processKeywordOrIdentifier(currentChar);
         else if (currentChar == '=' || currentChar == '!' || currentChar == '<' || currentChar == '>')
-            token = processOperator(currentChar);
-        else
+            token = processRelationalOperator(currentChar);
+        else if (currentChar == '+' || currentChar == '-')
+            token = processArithmeticOperators(currentChar);
+        else if (currentChar == '\"')
+            token = processString(currentChar);
+        else {
             switch (currentChar) {
                 case ';':
                     return PredefinedTokens.Others.SEMICOLON;
@@ -77,75 +52,163 @@ public class Scanner {
                     return PredefinedTokens.Others.PERIOD;
                 case ',':
                     return PredefinedTokens.Others.COMMA;
-                default:
+                default: // todo: return empty token here
                     System.out.println("Unexpected character received: " + currentChar);
                     throw new RuntimeException("Unexpected character received: " + currentChar);
             }
+        }
 
-            // todo: check if token is empty
-
+        if (token.getType() == TokenType.EMPTY){
+            // todo: throw/handle parsing exception
+        }
 
         return token;
     }
 
-    private Token processNumber(char currentChar) {
+    // todo: a co jak mi sie skoncza znaki ze zrodla?
+    private Token processString(char currentChar) {
+        StringBuilder token = new StringBuilder();
 
+        token.append(currentChar);
+
+        while(source.peek() != '\"')
+            token.append(source.nextChar());
+
+        token.append(source.nextChar());
+
+        return new Token(TokenType.CONST_CHAR, token.toString());
+    }
+
+    private Token processNumberOrDate(char currentChar) {
+        StringBuilder token = new StringBuilder();
+
+        token.append(currentChar);
+
+        while (Character.isDigit(source.peek())) {
+            token.append(source.nextChar());
+        }
+
+        if (source.peek() == '/' && token.length() == 2)
+            return processDate(token);
+
+        return new Token(TokenType.CONST_INT, token.toString());
     }
 
     private Token processKeywordOrIdentifier(char currentChar) {
+        StringBuilder token = new StringBuilder();
 
+        token.append(currentChar);
+
+        while (Character.isLetter(source.peek()) || Character.isDigit(source.peek())){
+            token.append(source.nextChar());
+        }
+
+        if (keywordsTable.containsKey(token.toString())){
+            return keywordsTable.get(token.toString());
+        }
+        else {
+            return new Token(TokenType.IDENTIFIER, token.toString());
+        }
     }
 
-    private Token processOperator(char currentChar) {
+    private Token processRelationalOperator(char currentChar) {
+        StringBuilder token = new StringBuilder();
 
+        token.append(currentChar);
+
+        if (source.peek() == '=') {
+            token.append(source.nextChar());
+        }
+
+        return keywordsTable.get(token.toString());
+    }
+
+    private Token processArithmeticOperators(char currentChar) {
+        StringBuilder token = new StringBuilder();
+
+        token.append(currentChar);
+
+        if (source.peek() == '=') {
+            token.append(source.nextChar());
+        }
+
+        return keywordsTable.get(token.toString());
+    }
+
+    private Token processDate(StringBuilder token) {
+        token.append(source.nextChar());
+
+        if (Character.isDigit(source.peek()))
+            token.append(source.nextChar());
+
+        if (Character.isDigit(source.peek()))
+            token.append(source.nextChar());
+
+        if (source.peek() == '/')
+            token.append(source.nextChar());
+
+        if (Character.isDigit(source.peek()))
+            token.append(source.nextChar());
+
+        if (Character.isDigit(source.peek()))
+            token.append(source.nextChar());
+
+        if (Character.isDigit(source.peek()))
+            token.append(source.nextChar());
+
+        if (Character.isDigit(source.peek()))
+            token.append(source.nextChar());
+
+        return new Token(TokenType.DATE, token.toString());
     }
 
     private void initializeKeywords() {
         keywordsTable = new HashMap<>();
-        keywordsTable.put("FOREACH", TokenType.FOREACH);
-        keywordsTable.put("IF", TokenType.IF);
-        keywordsTable.put("ELSE", TokenType.ELSE);
-        keywordsTable.put("RETURN", TokenType.RETURN);
-        keywordsTable.put("=", TokenType.ASSIGN_OP);
+        keywordsTable.put("foreach", PredefinedTokens.Others.FOREACH);
+        keywordsTable.put("if", PredefinedTokens.Others.IF);
+        keywordsTable.put("else", PredefinedTokens.Others.ELSE);
+        keywordsTable.put("return", PredefinedTokens.Others.RETURN);
+        keywordsTable.put("=", PredefinedTokens.Operators.ASSIGN);
 
-        // todo: it seems they are effectively useless - to be removed
-        keywordsTable.put(":", TokenType.COLON);
-        keywordsTable.put(";", TokenType.SEMICOLON);
-        keywordsTable.put(".", TokenType.PERIOD);
-        keywordsTable.put(",", TokenType.COMMA);
-
+        initializeArithmeticOperators();
         initializeBracersKeywords();
-
         initializeTypeKeywords();
-
         initializeRelationalOperatorKeywords();
     }
 
     private void initializeBracersKeywords() {
-        keywordsTable.put("(", TokenType.OPEN_BRACE);
-        keywordsTable.put(")", TokenType.CLOSED_BRACE);
+        keywordsTable.put("(", PredefinedTokens.Bracers.OPEN_BRACE);
+        keywordsTable.put(")", PredefinedTokens.Bracers.CLOSED_BRACE);
 
-        keywordsTable.put("[", TokenType.OPEN_SQUARE_BRACE);
-        keywordsTable.put("]", TokenType.CLOSED_SQUARE_BRACE);
+        keywordsTable.put("[", PredefinedTokens.Bracers.OPEN_SQUARE_BRACE);
+        keywordsTable.put("]", PredefinedTokens.Bracers.CLOSED_SQUARE_BRACE);
 
-        keywordsTable.put("{", TokenType.OPEN_CURLY_BRACE);
-        keywordsTable.put("}", TokenType.CLOSED_CURLY_BRACE);
+        keywordsTable.put("{", PredefinedTokens.Bracers.OPEN_CURLY_BRACE);
+        keywordsTable.put("}", PredefinedTokens.Bracers.CLOSED_CURLY_BRACE);
     }
 
     private void initializeTypeKeywords() {
-        keywordsTable.put("INT", TokenType.INT);
-        keywordsTable.put("STRING", TokenType.STRING);
-        keywordsTable.put("TRUE", TokenType.BOOL);
-        keywordsTable.put("FALSE", TokenType.BOOL);
-        keywordsTable.put("FILE", TokenType.FILE);
-        keywordsTable.put("CATALOGUE", TokenType.CATALOGUE);
+        keywordsTable.put("Int", PredefinedTokens.Types.INT);
+        keywordsTable.put("String", PredefinedTokens.Types.STRING);
+        keywordsTable.put("Bool", PredefinedTokens.Types.BOOL);
+        keywordsTable.put("File", PredefinedTokens.Types.FILE);
+        keywordsTable.put("CATALOGUE", PredefinedTokens.Types.CATALOGUE);
+        keywordsTable.put("Date", PredefinedTokens.Types.DATE);
     }
 
     private void initializeRelationalOperatorKeywords() {
-        keywordsTable.put("!=", TokenType.RELATIONAL_OP);
-        keywordsTable.put("<", TokenType.RELATIONAL_OP);
-        keywordsTable.put(">", TokenType.RELATIONAL_OP);
-        keywordsTable.put("<=", TokenType.RELATIONAL_OP);
-        keywordsTable.put(">=", TokenType.RELATIONAL_OP);
+        keywordsTable.put("!=", PredefinedTokens.Operators.Relational.NOT_EQUAL);
+        keywordsTable.put("<", PredefinedTokens.Operators.Relational.LESS);
+        keywordsTable.put(">", PredefinedTokens.Operators.Relational.GREATER);
+        keywordsTable.put("<=", PredefinedTokens.Operators.Relational.LESS_EQUAL);
+        keywordsTable.put(">=", PredefinedTokens.Operators.Relational.GREATER_EQUAL);
+        keywordsTable.put("==", PredefinedTokens.Operators.Relational.EQUAL);
+    }
+
+    private void initializeArithmeticOperators() {
+        keywordsTable.put("+=", PredefinedTokens.Operators.Arithmetic.PLUS_EQUAL);
+        keywordsTable.put("-=", PredefinedTokens.Operators.Arithmetic.MINUS_EQUAL);
+        keywordsTable.put("+", PredefinedTokens.Operators.Arithmetic.PLUS);
+        keywordsTable.put("-", PredefinedTokens.Operators.Arithmetic.MINUS);
     }
 }
