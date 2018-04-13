@@ -64,4 +64,12 @@ class Source {
     boolean isEoF() {
         return (int)currentChar == -1;
     }
+
+    public int getCharCounter() {
+        return charCounter;
+    }
+
+    public int getLineCounter() {
+        return lineCounter;
+    }
 }

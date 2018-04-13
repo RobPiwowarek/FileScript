@@ -39,6 +39,11 @@ public  class PredefinedTokens {
         public static final Token STRING = new Token(TokenType.STRING, "String");
     }
 
+    public static final class Constants {
+        public static final Token TRUE = new Token(TokenType.CONST_BOOL, "true");
+        public static final Token FALSE = new Token(TokenType.CONST_BOOL, "false");
+    }
+
     public static final class Others {
         public static final Token SEMICOLON = new Token(TokenType.SEMICOLON, ";");
         public static final Token COLON = new Token(TokenType.COLON, ":");
