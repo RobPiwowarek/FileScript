@@ -4,6 +4,11 @@ public  class PredefinedTokens {
     public static final class Operators {
         public static final Token ASSIGN = new Token(TokenType.ASSIGN_OP, "=");
 
+        public static final class Logical {
+            public static final Token AND = new Token(TokenType.LOGICAL_OP, "&&");
+            public static final Token OR = new Token(TokenType.LOGICAL_OP, "||");
+        }
+
         public static final class Relational {
             public static final Token EQUAL = new Token(TokenType.RELATIONAL_OP, "==");
             public static final Token NOT_EQUAL = new Token(TokenType.RELATIONAL_OP, "!=");
@@ -16,8 +21,8 @@ public  class PredefinedTokens {
         public static final class Arithmetic {
             public static final Token PLUS = new Token(TokenType.ARITHMETIC_OP, "+");
             public static final Token MINUS = new Token(TokenType.ARITHMETIC_OP, "-");
-            public static final Token PLUS_EQUAL = new Token(TokenType.ARITHMETIC_OP, "+=");
-            public static final Token MINUS_EQUAL = new Token(TokenType.ARITHMETIC_OP, "-=");
+            public static final Token MULTIPLY = new Token(TokenType.ARITHMETIC_OP, "*");
+            public static final Token DIVIDE = new Token(TokenType.ARITHMETIC_OP, "/");
         }
     }
 
@@ -31,12 +36,12 @@ public  class PredefinedTokens {
     }
 
     public static final class Types {
-        public static final Token DATE = new Token(TokenType.DATE, "Date");
-        public static final Token INT = new Token(TokenType.INT, "Int");
-        public static final Token BOOL = new Token(TokenType.BOOL, "Bool");
-        public static final Token FILE = new Token(TokenType.FILE, "File");
-        public static final Token CATALOGUE = new Token(TokenType.CATALOGUE, "Catalogue");
-        public static final Token STRING = new Token(TokenType.STRING, "String");
+        public static final Token DATE = new Token(TokenType.DATE, "date");
+        public static final Token INT = new Token(TokenType.INT, "int");
+        public static final Token BOOL = new Token(TokenType.BOOL, "bool");
+        public static final Token FILE = new Token(TokenType.FILE, "file");
+        public static final Token CATALOGUE = new Token(TokenType.CATALOGUE, "catalogue");
+        public static final Token STRING = new Token(TokenType.STRING, "string");
     }
 
     public static final class Constants {
@@ -49,7 +54,6 @@ public  class PredefinedTokens {
         public static final Token COLON = new Token(TokenType.COLON, ":");
         public static final Token PERIOD = new Token(TokenType.PERIOD, ".");
         public static final Token COMMA = new Token(TokenType.COMMA, ",");
-        public static final Token VAR = new Token(TokenType.VAR, "var");
         public static final Token IF = new Token(TokenType.IF, "if");
         public static final Token ELSE = new Token(TokenType.ELSE, "else");
         public static final Token FOREACH = new Token(TokenType.FOREACH, "foreach");

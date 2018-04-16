@@ -7,6 +7,8 @@ import lexer.token.TokenType;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 // fixme: moglbym wszystkiemu dac sprawdzenie czy nie ma juz EOF
 public class Scanner {
@@ -40,28 +42,18 @@ public class Scanner {
             token = processNumberOrDate(currentChar);
         else if (Character.isLetter(currentChar))
             token = processKeywordOrIdentifier(currentChar);
+        else if (currentChar == '&' || currentChar == '|')
+            token = processLogicalOperator(currentChar);
         else if (currentChar == '=' || currentChar == '!' || currentChar == '<' || currentChar == '>')
             token = processRelationalOperator(currentChar);
-        else if (currentChar == '+' || currentChar == '-')
-            token = processArithmeticOperator(currentChar);
         else if (currentChar == '\"')
             token = processString(currentChar);
-        else {
-            switch (currentChar) {
-                case ';':
-                    return PredefinedTokens.Others.SEMICOLON;
-                case ':':
-                    return PredefinedTokens.Others.COLON;
-                case '.':
-                    return PredefinedTokens.Others.PERIOD;
-                case ',':
-                    return PredefinedTokens.Others.COMMA;
-                default:
-                    token = ErrorToken(currentChar);
-            }
-        }
+        else if (currentChar == '(' || currentChar == ')' || currentChar == '[' || currentChar == ']' || currentChar == '{' || currentChar == '}')
+            token = keywordsTable.get(Character.toString(currentChar));
+        else
+            token = processSingleCharacterToken(currentChar);
 
-        if (token.getType() == TokenType.EMPTY){
+        if (token.getType() == TokenType.EMPTY) {
             // todo: throw/handle parsing exception?
         }
 
@@ -77,12 +69,12 @@ public class Scanner {
 
         token.append(currentChar);
 
-        while(source.peek() != '\"' && !source.isEoF())
+        while (source.peek() != '\"' && !source.isEoF())
             token.append(source.nextChar());
 
         token.append(source.nextChar());
 
-        return new Token(TokenType.CONST_CHAR, token.toString());
+        return new Token(TokenType.CONST_STRING, token.toString());
     }
 
     private Token processNumberOrDate(char currentChar) {
@@ -105,18 +97,31 @@ public class Scanner {
 
         token.append(currentChar);
 
-        while (Character.isLetter(source.peek()) || Character.isDigit(source.peek()) && !source.isEoF()){
+        while (Character.isLetter(source.peek()) || Character.isDigit(source.peek()) && !source.isEoF()) {
             token.append(source.nextChar());
         }
 
-        if (keywordsTable.containsKey(token.toString())){
+        if (keywordsTable.containsKey(token.toString())) {
             return keywordsTable.get(token.toString());
-        }
-        else {
+        } else {
             return new Token(TokenType.IDENTIFIER, token.toString());
         }
     }
 
+    private Token processLogicalOperator(char currentChar) {
+        StringBuilder token = new StringBuilder();
+        
+        token.append(currentChar);
+        
+        if (source.peek() == '&' && currentChar == '&' || source.peek() == '|' && currentChar == '|'){
+            token.append(source.nextChar());
+        }
+        else 
+            return ErrorToken(source.peek());
+        
+        return keywordsTable.get(token.toString());
+    }
+    
     private Token processRelationalOperator(char currentChar) {
         StringBuilder token = new StringBuilder();
 
@@ -125,8 +130,6 @@ public class Scanner {
         if (source.peek() == '=') {
             token.append(source.nextChar());
         }
-        else
-            return ErrorToken(source.peek());
 
         return keywordsTable.get(token.toString());
     }
@@ -136,54 +139,61 @@ public class Scanner {
 
         token.append(currentChar);
 
-        if (source.peek() == '=') {
-            token.append(source.nextChar());
-        }
-        else
-            return ErrorToken(source.peek());
-
         return keywordsTable.get(token.toString());
     }
 
     private Token processDate(StringBuilder token) {
         token.append(source.nextChar());
-
-        if (Character.isDigit(source.peek()) && !source.isEoF())
-            token.append(source.nextChar());
-        else
+        
+        try {
+            tryParse(Character::isDigit, token, 2);
+            tryParse(character -> character == '/', token, 1);
+            tryParse(Character::isDigit, token, 4);
+            if (source.peek() == ':') {
+                token.append(source.nextChar());
+                tryParse(Character::isDigit, token, 2);
+                tryParse(character -> character == ':', token, 1);
+                tryParse(Character::isDigit, token, 2);
+                tryParse(character -> character == ':', token, 1);
+                tryParse(Character::isDigit, token, 2);
+            }
+        } catch (Exception e) {
             return ErrorToken(source.peek());
-
-        if (Character.isDigit(source.peek()) && !source.isEoF())
-            token.append(source.nextChar());
-        else
-            return ErrorToken(source.peek());
-
-        if (source.peek() == '/' && !source.isEoF())
-            token.append(source.nextChar());
-        else
-            return ErrorToken(source.peek());
-
-        if (Character.isDigit(source.peek()) && !source.isEoF())
-            token.append(source.nextChar());
-        else
-            return ErrorToken(source.peek());
-
-        if (Character.isDigit(source.peek()) && !source.isEoF())
-            token.append(source.nextChar());
-        else
-            return ErrorToken(source.peek());
-
-        if (Character.isDigit(source.peek()) && !source.isEoF())
-            token.append(source.nextChar());
-        else
-            return ErrorToken(source.peek());
-
-        if (Character.isDigit(source.peek()) && !source.isEoF())
-            token.append(source.nextChar());
-        else
-            return ErrorToken(source.peek());
+        }
 
         return new Token(TokenType.CONST_DATE, token.toString());
+    }
+
+    private void tryParse(Predicate<Character> predicate, StringBuilder token, int length){
+        for (int i = 0; i < length; ++i){
+            if (predicate.test(source.peek()) && !source.isEoF())
+                token.append(source.nextChar());
+            else
+                throw new NoSuchElementException();
+        }
+    }
+
+    private Token processSingleCharacterToken(char currentChar) {
+        switch (currentChar) {
+            case ';':
+                return PredefinedTokens.Others.SEMICOLON;
+            case ':':
+                return PredefinedTokens.Others.COLON;
+            case '.':
+                return PredefinedTokens.Others.PERIOD;
+            case ',':
+                return PredefinedTokens.Others.COMMA;
+            case '+':
+                return PredefinedTokens.Operators.Arithmetic.PLUS;
+            case '-':
+                return PredefinedTokens.Operators.Arithmetic.MINUS;
+            case '*':
+                return PredefinedTokens.Operators.Arithmetic.MULTIPLY;
+            case '/':
+                return PredefinedTokens.Operators.Arithmetic.DIVIDE;
+            default:
+                return ErrorToken(currentChar);
+        }
     }
 
     private void initializeKeywords() {
@@ -197,10 +207,16 @@ public class Scanner {
         keywordsTable.put("true", PredefinedTokens.Constants.TRUE);
         keywordsTable.put("false", PredefinedTokens.Constants.FALSE);
 
-        initializeArithmeticOperators();
+        initializeArithmeticOperatorKeywords();
         initializeBracersKeywords();
         initializeTypeKeywords();
         initializeRelationalOperatorKeywords();
+        initializeLogicalOperatorKeywords();
+    }
+
+    private void initializeLogicalOperatorKeywords() {
+        keywordsTable.put("&&", PredefinedTokens.Operators.Logical.AND);
+        keywordsTable.put("||", PredefinedTokens.Operators.Logical.OR);
     }
 
     private void initializeBracersKeywords() {
@@ -215,12 +231,12 @@ public class Scanner {
     }
 
     private void initializeTypeKeywords() {
-        keywordsTable.put("Int", PredefinedTokens.Types.INT);
-        keywordsTable.put("String", PredefinedTokens.Types.STRING);
-        keywordsTable.put("Bool", PredefinedTokens.Types.BOOL);
-        keywordsTable.put("File", PredefinedTokens.Types.FILE);
-        keywordsTable.put("CATALOGUE", PredefinedTokens.Types.CATALOGUE);
-        keywordsTable.put("Date", PredefinedTokens.Types.DATE);
+        keywordsTable.put("int", PredefinedTokens.Types.INT);
+        keywordsTable.put("string", PredefinedTokens.Types.STRING);
+        keywordsTable.put("bool", PredefinedTokens.Types.BOOL);
+        keywordsTable.put("file", PredefinedTokens.Types.FILE);
+        keywordsTable.put("catalogue", PredefinedTokens.Types.CATALOGUE);
+        keywordsTable.put("date", PredefinedTokens.Types.DATE);
     }
 
     private void initializeRelationalOperatorKeywords() {
@@ -232,9 +248,9 @@ public class Scanner {
         keywordsTable.put("==", PredefinedTokens.Operators.Relational.EQUAL);
     }
 
-    private void initializeArithmeticOperators() {
-        keywordsTable.put("+=", PredefinedTokens.Operators.Arithmetic.PLUS_EQUAL);
-        keywordsTable.put("-=", PredefinedTokens.Operators.Arithmetic.MINUS_EQUAL);
+    private void initializeArithmeticOperatorKeywords() {
+        keywordsTable.put("*", PredefinedTokens.Operators.Arithmetic.MULTIPLY);
+        keywordsTable.put("/", PredefinedTokens.Operators.Arithmetic.DIVIDE);
         keywordsTable.put("+", PredefinedTokens.Operators.Arithmetic.PLUS);
         keywordsTable.put("-", PredefinedTokens.Operators.Arithmetic.MINUS);
     }
