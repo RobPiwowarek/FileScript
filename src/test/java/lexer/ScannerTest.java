@@ -10,126 +10,126 @@ import static org.junit.Assert.*;
 public class ScannerTest {
 
     @Test
-    public void shouldParseIntType(){
+    public void shouldParseIntType() {
         Scanner scanner = new Scanner("int");
 
         assertEquals(scanner.getNextToken(), KeywordsTable.get("int"));
     }
 
     @Test
-    public void shouldParseBoolType(){
+    public void shouldParseBoolType() {
         Scanner scanner = new Scanner("bool");
 
         assertEquals(scanner.getNextToken(), KeywordsTable.get("bool"));
     }
 
     @Test
-    public void shouldParseStringType(){
+    public void shouldParseStringType() {
         Scanner scanner = new Scanner("string");
 
         assertEquals(scanner.getNextToken(), KeywordsTable.get("string"));
     }
 
     @Test
-    public void shouldParseFileType(){
+    public void shouldParseFileType() {
         Scanner scanner = new Scanner("file");
 
         assertEquals(scanner.getNextToken(), KeywordsTable.get("file"));
     }
 
     @Test
-    public void shouldParseCatalogueType(){
+    public void shouldParseCatalogueType() {
         Scanner scanner = new Scanner("catalogue");
 
         assertEquals(scanner.getNextToken(), KeywordsTable.get("catalogue"));
     }
 
     @Test
-    public void shouldParseDateType(){
+    public void shouldParseDateType() {
         Scanner scanner = new Scanner("date");
 
         assertEquals(scanner.getNextToken(), KeywordsTable.get("date"));
     }
 
     @Test
-    public void shouldParseAssignOp(){
+    public void shouldParseAssignOp() {
         Scanner scanner = new Scanner("=");
 
         assertEquals(scanner.getNextToken(), KeywordsTable.get("="));
     }
 
     @Test
-    public void shouldParseRelationalNotEqualOp(){
+    public void shouldParseRelationalNotEqualOp() {
         Scanner scanner = new Scanner("!=");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Relational.NOT_EQUAL);
     }
 
     @Test
-    public void shouldParseRelationalLessOp(){
+    public void shouldParseRelationalLessOp() {
         Scanner scanner = new Scanner("<");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Relational.LESS);
     }
 
     @Test
-    public void shouldParseRelationalLessEqualOp(){
+    public void shouldParseRelationalLessEqualOp() {
         Scanner scanner = new Scanner("<=");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Relational.LESS_EQUAL);
     }
 
     @Test
-    public void shouldParseRelationalGreaterOp(){
+    public void shouldParseRelationalGreaterOp() {
         Scanner scanner = new Scanner(">");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Relational.GREATER);
     }
 
     @Test
-    public void shouldParseRelationalGreaterEqualOp(){
+    public void shouldParseRelationalGreaterEqualOp() {
         Scanner scanner = new Scanner(">=");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Relational.GREATER_EQUAL);
     }
 
     @Test
-    public void shouldParseArithmeticPlusOp(){
+    public void shouldParseArithmeticPlusOp() {
         Scanner scanner = new Scanner("+");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Arithmetic.PLUS);
     }
 
     @Test
-    public void shouldParseArithmeticMinusOp(){
+    public void shouldParseArithmeticMinusOp() {
         Scanner scanner = new Scanner("-");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Arithmetic.MINUS);
     }
 
     @Test
-    public void shouldParseArithmeticMultiplyOp(){
+    public void shouldParseArithmeticMultiplyOp() {
         Scanner scanner = new Scanner("*");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Arithmetic.MULTIPLY);
     }
 
     @Test
-    public void shouldParseArithmeticDivideOp(){
+    public void shouldParseArithmeticDivideOp() {
         Scanner scanner = new Scanner("/");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Arithmetic.DIVIDE);
     }
 
     @Test
-    public void shouldParseLogicalAndOp(){
+    public void shouldParseLogicalAndOp() {
         Scanner scanner = new Scanner("&&");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Logical.AND);
     }
 
     @Test
-    public void shouldParseLogicalOrOp(){
+    public void shouldParseLogicalOrOp() {
         Scanner scanner = new Scanner("||");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Operators.Logical.OR);
@@ -137,28 +137,28 @@ public class ScannerTest {
 
 
     @Test
-    public void shouldParseIfKeyword(){
+    public void shouldParseIfKeyword() {
         Scanner scanner = new Scanner("if");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.IF);
     }
 
     @Test
-    public void shouldParseElseKeyword(){
+    public void shouldParseElseKeyword() {
         Scanner scanner = new Scanner("else");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.ELSE);
     }
 
     @Test
-    public void shouldParseForeachKeyword(){
+    public void shouldParseForeachKeyword() {
         Scanner scanner = new Scanner("foreach");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.FOREACH);
     }
 
     @Test
-    public void shouldParseConstInt(){
+    public void shouldParseConstInt() {
         String value = "12345";
         Scanner scanner = new Scanner(value);
 
@@ -169,7 +169,7 @@ public class ScannerTest {
     }
 
     @Test
-    public void shouldParseConstString(){
+    public void shouldParseConstString() {
         String value = "\"12345\"";
         Scanner scanner = new Scanner(value);
 
@@ -180,21 +180,21 @@ public class ScannerTest {
     }
 
     @Test
-    public void shouldParseConstTrueBool(){
+    public void shouldParseConstTrueBool() {
         Scanner scanner = new Scanner("true");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Constants.TRUE);
     }
 
     @Test
-    public void shouldParseConstFalseBool(){
+    public void shouldParseConstFalseBool() {
         Scanner scanner = new Scanner("false");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Constants.FALSE);
     }
 
     @Test
-    public void shouldParseSimpleIdentifier(){
+    public void shouldParseSimpleIdentifier() {
         String value = "abcd";
         Scanner scanner = new Scanner(value);
 
@@ -205,7 +205,7 @@ public class ScannerTest {
     }
 
     @Test
-    public void shouldParseComma(){
+    public void shouldParseComma() {
         Scanner scanner = new Scanner(",");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.COMMA);
@@ -213,7 +213,7 @@ public class ScannerTest {
 
 
     @Test
-    public void shouldParseColon(){
+    public void shouldParseColon() {
         Scanner scanner = new Scanner(":");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.COLON);
@@ -221,7 +221,7 @@ public class ScannerTest {
 
 
     @Test
-    public void shouldParseSemiColon(){
+    public void shouldParseSemiColon() {
         Scanner scanner = new Scanner(";");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.SEMICOLON);
@@ -229,70 +229,70 @@ public class ScannerTest {
 
 
     @Test
-    public void shouldParsePeriod(){
+    public void shouldParsePeriod() {
         Scanner scanner = new Scanner(".");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.PERIOD);
     }
 
     @Test
-    public void shouldParseReturnKeyword(){
+    public void shouldParseReturnKeyword() {
         Scanner scanner = new Scanner("return");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.RETURN);
     }
 
     @Test
-    public void shouldParseOpenBracer(){
+    public void shouldParseOpenBracer() {
         Scanner scanner = new Scanner("(");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Bracers.OPEN_BRACE);
     }
 
     @Test
-    public void shouldParseClosedBracer(){
+    public void shouldParseClosedBracer() {
         Scanner scanner = new Scanner(")");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Bracers.CLOSED_BRACE);
     }
 
     @Test
-    public void shouldParseOpenSquareBracer(){
+    public void shouldParseOpenSquareBracer() {
         Scanner scanner = new Scanner("[");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Bracers.OPEN_SQUARE_BRACE);
     }
 
     @Test
-    public void shouldParseClosedSquareBracer(){
+    public void shouldParseClosedSquareBracer() {
         Scanner scanner = new Scanner("]");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Bracers.CLOSED_SQUARE_BRACE);
     }
 
     @Test
-    public void shouldParseOpenCurlyBracer(){
+    public void shouldParseOpenCurlyBracer() {
         Scanner scanner = new Scanner("{");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Bracers.OPEN_CURLY_BRACE);
     }
 
     @Test
-    public void shouldParseClosedCurlyBracer(){
+    public void shouldParseClosedCurlyBracer() {
         Scanner scanner = new Scanner("}");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Bracers.CLOSED_CURLY_BRACE);
     }
 
     @Test
-    public void shouldParseDefKeyword(){
+    public void shouldParseDefKeyword() {
         Scanner scanner = new Scanner("def");
 
         assertEquals(scanner.getNextToken(), PredefinedTokens.Others.DEF);
     }
 
     @Test
-    public void shouldCorrectlyIgnoreWhitespaces(){
+    public void shouldCorrectlyIgnoreWhitespaces() {
         Scanner scanner = new Scanner("       andvsf          kdaslkjadj");
 
         Token token = scanner.getNextToken();
@@ -306,7 +306,7 @@ public class ScannerTest {
     }
 
     @Test
-    public void shouldCorreclyParseAllTokens() {
+    public void shouldCorrectlyParseAllTokens() {
         String tokens = "funkcja(); abcd: int = 5; def funkcja() = { println(abcd); }";
 
         Scanner scanner = new Scanner(tokens);
@@ -383,5 +383,4 @@ public class ScannerTest {
         token = scanner.getNextToken();
         assertEquals(token, PredefinedTokens.Bracers.CLOSED_CURLY_BRACE);
     }
-
 }

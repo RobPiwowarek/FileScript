@@ -62,7 +62,7 @@ class Source {
     }
 
     boolean isEoF() {
-        return (int)currentChar == -1;
+        return (int) currentChar == -1;
     }
 
     public int getCharCounter() {

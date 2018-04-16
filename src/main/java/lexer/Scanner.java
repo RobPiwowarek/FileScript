@@ -18,7 +18,9 @@ public class Scanner {
         source = new Source(fileSource);
     }
 
-    public Scanner(String stringSource) { source = new Source(new ByteArrayInputStream(stringSource.getBytes())); }
+    public Scanner(String stringSource) {
+        source = new Source(new ByteArrayInputStream(stringSource.getBytes()));
+    }
 
     Token getNextToken() {
         if (source.isEoF())
@@ -30,7 +32,7 @@ public class Scanner {
         if (Character.isWhitespace(currentChar))
             do {
                 currentChar = source.nextChar();
-            } while(Character.isWhitespace(currentChar) && !source.isEoF());
+            } while (Character.isWhitespace(currentChar) && !source.isEoF());
 
         if (source.isEoF())
             return EndOfFileToken();
@@ -55,7 +57,7 @@ public class Scanner {
         return new Token(TokenType.EMPTY, "Unexpected character " + currentChar + " at " + source.getLineCounter() + ":" + source.getCharCounter());
     }
 
-    private Token EndOfFileToken(){
+    private Token EndOfFileToken() {
         return new Token(TokenType.EOF, "No more tokens");
     }
 
@@ -103,18 +105,17 @@ public class Scanner {
 
     private Token processLogicalOperator(char currentChar) {
         StringBuilder token = new StringBuilder();
-        
+
         token.append(currentChar);
-        
-        if (source.peek() == '&' && currentChar == '&' || source.peek() == '|' && currentChar == '|'){
+
+        if (source.peek() == '&' && currentChar == '&' || source.peek() == '|' && currentChar == '|') {
             token.append(source.nextChar());
-        }
-        else 
+        } else
             return ErrorToken(source.peek());
-        
+
         return KeywordsTable.get(token.toString());
     }
-    
+
     private Token processRelationalOrAssignmentOperator(char currentChar) {
         StringBuilder token = new StringBuilder();
 
@@ -122,8 +123,7 @@ public class Scanner {
 
         if (source.peek() == '=') {
             token.append(source.nextChar());
-        }
-        else {
+        } else {
             if (currentChar == '!')
                 return ErrorToken(source.peek());
         }

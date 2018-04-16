@@ -13,7 +13,7 @@ class KeywordsTable {
         initializeKeywords();
     }
 
-    static Token get(String key){
+    static Token get(String key) {
         return keywordsTable.get(key);
     }
 

@@ -1,6 +1,6 @@
 package lexer.token;
 
-public  class PredefinedTokens {
+public class PredefinedTokens {
     public static final class Operators {
         public static final Token ASSIGN = new Token(TokenType.ASSIGN_OP, "=");
 
