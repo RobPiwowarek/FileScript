@@ -36,12 +36,12 @@ public  class PredefinedTokens {
     }
 
     public static final class Types {
-        public static final Token DATE = new Token(TokenType.DATE, "date");
-        public static final Token INT = new Token(TokenType.INT, "int");
-        public static final Token BOOL = new Token(TokenType.BOOL, "bool");
-        public static final Token FILE = new Token(TokenType.FILE, "file");
-        public static final Token CATALOGUE = new Token(TokenType.CATALOGUE, "catalogue");
-        public static final Token STRING = new Token(TokenType.STRING, "string");
+        public static final Token DATE = new Token(TokenType.DATE_TYPE, "date");
+        public static final Token INT = new Token(TokenType.INT_TYPE, "int");
+        public static final Token BOOL = new Token(TokenType.BOOL_TYPE, "bool");
+        public static final Token FILE = new Token(TokenType.FILE_TYPE, "file");
+        public static final Token CATALOGUE = new Token(TokenType.CATALOGUE_TYPE, "catalogue");
+        public static final Token STRING = new Token(TokenType.STRING_TYPE, "string");
     }
 
     public static final class Constants {
@@ -58,6 +58,6 @@ public  class PredefinedTokens {
         public static final Token ELSE = new Token(TokenType.ELSE, "else");
         public static final Token FOREACH = new Token(TokenType.FOREACH, "foreach");
         public static final Token RETURN = new Token(TokenType.RETURN, "return");
-        public static final Token EMPTY = new Token(TokenType.EMPTY, "<EMPTY>");
+        public static final Token DEF = new Token(TokenType.EMPTY, "def");
     }
 }

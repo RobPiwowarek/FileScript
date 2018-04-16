@@ -24,9 +24,15 @@ class KeywordsTable {
         keywordsTable.put("else", PredefinedTokens.Others.ELSE);
         keywordsTable.put("return", PredefinedTokens.Others.RETURN);
         keywordsTable.put("=", PredefinedTokens.Operators.ASSIGN);
+        keywordsTable.put("def", PredefinedTokens.Others.DEF);
 
         keywordsTable.put("true", PredefinedTokens.Constants.TRUE);
         keywordsTable.put("false", PredefinedTokens.Constants.FALSE);
+
+        keywordsTable.put(".", PredefinedTokens.Others.PERIOD);
+        keywordsTable.put(",", PredefinedTokens.Others.COMMA);
+        keywordsTable.put(";", PredefinedTokens.Others.SEMICOLON);
+        keywordsTable.put(":", PredefinedTokens.Others.COLON);
 
         initializeArithmeticOperatorKeywords();
         initializeBracersKeywords();

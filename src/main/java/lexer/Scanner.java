@@ -4,11 +4,9 @@ import lexer.exception.EmptySourceException;
 import lexer.token.Token;
 import lexer.token.TokenType;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.NoSuchElementException;
-import java.util.function.Predicate;
 
-// fixme: moglbym wszystkiemu dac sprawdzenie czy nie ma juz EOF
 public class Scanner {
     private Source source;
 
@@ -20,15 +18,22 @@ public class Scanner {
         source = new Source(fileSource);
     }
 
-    private Token getNextToken() {
+    public Scanner(String stringSource) { source = new Source(new ByteArrayInputStream(stringSource.getBytes())); }
+
+    Token getNextToken() {
         if (source.isEoF())
             throw new EmptySourceException();
 
         char currentChar = source.nextChar();
         Token token;
 
-        while (Character.isWhitespace(source.peek()) || Character.isWhitespace(currentChar))
-            currentChar = source.nextChar();
+        if (Character.isWhitespace(currentChar))
+            do {
+                currentChar = source.nextChar();
+            } while(Character.isWhitespace(currentChar) && !source.isEoF());
+
+        if (source.isEoF())
+            return EndOfFileToken();
 
         if (Character.isDigit(currentChar))
             token = processNumberOrDate(currentChar);
@@ -37,23 +42,21 @@ public class Scanner {
         else if (currentChar == '&' || currentChar == '|')
             token = processLogicalOperator(currentChar);
         else if (currentChar == '=' || currentChar == '!' || currentChar == '<' || currentChar == '>')
-            token = processRelationalOperator(currentChar);
+            token = processRelationalOrAssignmentOperator(currentChar);
         else if (currentChar == '\"')
             token = processString(currentChar);
-        else if (currentChar == '(' || currentChar == ')' || currentChar == '[' || currentChar == ']' || currentChar == '{' || currentChar == '}')
-            token = KeywordsTable.get(Character.toString(currentChar));
         else
             token = processSingleCharacterToken(currentChar);
-
-        if (token.getType() == TokenType.EMPTY) {
-            // todo: throw/handle parsing exception?
-        }
 
         return token;
     }
 
     private Token ErrorToken(char currentChar) {
         return new Token(TokenType.EMPTY, "Unexpected character " + currentChar + " at " + source.getLineCounter() + ":" + source.getCharCounter());
+    }
+
+    private Token EndOfFileToken(){
+        return new Token(TokenType.EOF, "No more tokens");
     }
 
     private Token processString(char currentChar) {
@@ -64,7 +67,8 @@ public class Scanner {
         while (source.peek() != '\"' && !source.isEoF())
             token.append(source.nextChar());
 
-        token.append(source.nextChar());
+        if (!source.isEoF())
+            token.append(source.nextChar());
 
         return new Token(TokenType.CONST_STRING, token.toString());
     }
@@ -77,9 +81,6 @@ public class Scanner {
         while (Character.isDigit(source.peek()) && !source.isEoF()) {
             token.append(source.nextChar());
         }
-
-        if (source.peek() == '/' && token.length() == 2)
-            return processDate(token);
 
         return new Token(TokenType.CONST_INT, token.toString());
     }
@@ -114,7 +115,7 @@ public class Scanner {
         return KeywordsTable.get(token.toString());
     }
     
-    private Token processRelationalOperator(char currentChar) {
+    private Token processRelationalOrAssignmentOperator(char currentChar) {
         StringBuilder token = new StringBuilder();
 
         token.append(currentChar);
@@ -122,47 +123,12 @@ public class Scanner {
         if (source.peek() == '=') {
             token.append(source.nextChar());
         }
-
-        return KeywordsTable.get(token.toString());
-    }
-
-    private Token processArithmeticOperator(char currentChar) {
-        StringBuilder token = new StringBuilder();
-
-        token.append(currentChar);
-
-        return KeywordsTable.get(token.toString());
-    }
-
-    private Token processDate(StringBuilder token) {
-        token.append(source.nextChar());
-        
-        try {
-            tryParse(Character::isDigit, token, 2);
-            tryParse(character -> character == '/', token, 1);
-            tryParse(Character::isDigit, token, 4);
-            if (source.peek() == ':') {
-                token.append(source.nextChar());
-                tryParse(Character::isDigit, token, 2);
-                tryParse(character -> character == ':', token, 1);
-                tryParse(Character::isDigit, token, 2);
-                tryParse(character -> character == ':', token, 1);
-                tryParse(Character::isDigit, token, 2);
-            }
-        } catch (Exception e) {
-            return ErrorToken(source.peek());
+        else {
+            if (currentChar == '!')
+                return ErrorToken(source.peek());
         }
 
-        return new Token(TokenType.CONST_DATE, token.toString());
-    }
-
-    private void tryParse(Predicate<Character> predicate, StringBuilder token, int length){
-        for (int i = 0; i < length; ++i){
-            if (predicate.test(source.peek()) && !source.isEoF())
-                token.append(source.nextChar());
-            else
-                throw new NoSuchElementException();
-        }
+        return KeywordsTable.get(token.toString());
     }
 
     private Token processSingleCharacterToken(char currentChar) {
