@@ -37,8 +37,8 @@ public class Scanner {
         if (source.isEoF())
             return EndOfFileToken();
 
-        if (Character.isDigit(currentChar))
-            token = processNumberOrDate(currentChar);
+        if (Character.isDigit(currentChar) && currentChar != '0')
+            token = processNumber(currentChar);
         else if (Character.isLetter(currentChar))
             token = processKeywordOrIdentifier(currentChar);
         else if (currentChar == '&' || currentChar == '|')
@@ -66,8 +66,12 @@ public class Scanner {
 
         token.append(currentChar);
 
-        while (source.peek() != '\"' && !source.isEoF())
-            token.append(source.nextChar());
+        while (!source.isEoF()) {
+            if ((source.peek() == '\"' && token.charAt(token.length() - 1) == '\\') || source.peek() != '\"')
+                token.append(source.nextChar());
+            else
+                break;
+        }
 
         if (!source.isEoF())
             token.append(source.nextChar());
@@ -75,7 +79,7 @@ public class Scanner {
         return new Token(TokenType.CONST_STRING, token.toString());
     }
 
-    private Token processNumberOrDate(char currentChar) {
+    private Token processNumber(char currentChar) {
         StringBuilder token = new StringBuilder();
 
         token.append(currentChar);

@@ -180,6 +180,17 @@ public class ScannerTest {
     }
 
     @Test
+    public void shouldParseConstStringWithEscapedQuotesInside() {
+        String value = "\"\\\"12345\\\"\"";
+        Scanner scanner = new Scanner(value);
+
+        Token token = scanner.getNextToken();
+
+        assertEquals(token.getType(), TokenType.CONST_STRING);
+        assertEquals(token.getValue(), value);
+    }
+
+    @Test
     public void shouldParseConstTrueBool() {
         Scanner scanner = new Scanner("true");
 
