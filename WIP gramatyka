@@ -1,0 +1,93 @@
+assign = primitiveAssign | arrayAssign
+
+assignOp = '=' | '+=' | '-=' ;
+
+primitiveAssign = ("var" identWithType | ident | access) assignOp returnable ';' { primitiveAssign }
+
+arrayAssign = ("var" identWithType | ident | access) '[' {intconst} ']' { assignOp (ident | functionCall | access) } ';' {arrayAssign}
+
+foreach = "foreach" identWithType "in" (ident | access) '{' instructionList '}'
+
+
+function = "def" ident '(' typedArgList ')' ':' type '=' (instruction ';' | '{' instructionList '}') 
+
+typedArgList = identWithType {',' typedArgList}
+
+functionCall = ident '(' argList ')' ';'
+
+argList = ident {',' argList}
+
+
+
+declaration = "var" ident ':' (simpleType | fileType '{' assignFileAttribute  '}' | '[' {intconst} ']' ) ';' {declaration}
+
+assignFileAttribute = ident '=' (constValue | ident) ';' {assignFileAttribute}
+
+return = "return" returnable ';'
+
+returnable = constValue | ident | access | functionCall | returnable arithmeticOperator returnable
+
+instructionList = { instruction ';' | foreach { instructionList } }
+
+instruction = assign | functionCall | declaration | return | if | arithmeticInstruction
+
+
+
+if = "if" '(' condition ')' '{' instructionList '}' {"else" '{' instructionList '}'}
+
+condition = comparable relOp comparable
+
+comparable = ident | functionCall | constValue | access
+
+
+
+type = filetype | simpleType | monthType
+
+fileType = "File" | "Catalogue"
+
+simpleType = "Int" | "String" | "Bool" | dateType
+
+dateType = "Date" | "Month"
+
+
+
+access = (ident '.' ident | ident '[' intconst | functionCall | access | ident ']') {'.' ident} 
+
+relOp = '=' | '<' | '>' | '<=' | '!=' | '>='
+
+
+
+arithmeticInstruction = arithmetic ';' {arithmetic}
+
+arithmetic = arithmeticTokens arithmeticOperator arithemeticTokens
+
+arithmeticTokens = ident | functionCall | constValue | access
+
+arithmeticOperator = '+' | '-' | "+=" | "-="
+
+
+
+constValue = intconst | charconst | boolconst | dateconst | monthconst
+
+charconst = '"' char | digit {char | digit} '"'
+
+intconst = digit { digit } 
+
+boolconst = "true" | "false"
+
+dateconst = day '/' month '/' year 
+
+monthconst = "Jan" | "Feb" | "Mar" | "Apr" | "May" | "Jun" | "Jul" | "Aug" | "Sep" | "Oct" | "Nov" | "Dec"
+
+day = digit digit
+
+month = digit digit | monthconst
+
+year = digit digit digit digit
+
+
+
+identWithType = ident ":" type
+
+ident = char { char | digit }
+
