@@ -1,4 +1,4 @@
-package parser.structures;
+package parser.ast;
 
 public abstract class Node {
 }
