@@ -9,25 +9,28 @@ import java.io.File;
 
 public class Scanner {
     private Source source;
+    private Token currentToken;
 
     public Scanner() {
         source = new Source(System.in);
+        getNextToken();
     }
 
     public Scanner(File fileSource) {
         source = new Source(fileSource);
+        getNextToken();
     }
 
     public Scanner(String stringSource) {
         source = new Source(new ByteArrayInputStream(stringSource.getBytes()));
+        getNextToken();
     }
 
-    Token getNextToken() {
+    private void getNextToken() {
         if (source.isEoF())
             throw new EmptySourceException();
 
         char currentChar = source.nextChar();
-        Token token;
 
         if (Character.isWhitespace(currentChar))
             do {
@@ -35,22 +38,31 @@ public class Scanner {
             } while (Character.isWhitespace(currentChar) && !source.isEoF());
 
         if (source.isEoF())
-            return EndOfFileToken();
-
-        if (Character.isDigit(currentChar) && currentChar != '0')
-            token = processNumber(currentChar);
+            currentToken = EndOfFileToken();
+        else if (Character.isDigit(currentChar) && currentChar != '0')
+            currentToken = processNumber(currentChar);
         else if (Character.isLetter(currentChar))
-            token = processKeywordOrIdentifier(currentChar);
+            currentToken = processKeywordOrIdentifier(currentChar);
         else if (currentChar == '&' || currentChar == '|')
-            token = processLogicalOperator(currentChar);
+            currentToken = processLogicalOperator(currentChar);
         else if (currentChar == '=' || currentChar == '!' || currentChar == '<' || currentChar == '>')
-            token = processRelationalOrAssignmentOperator(currentChar);
+            currentToken = processRelationalOrAssignmentOperator(currentChar);
         else if (currentChar == '\"')
-            token = processString(currentChar);
+            currentToken = processString(currentChar);
         else
-            token = processSingleCharacterToken(currentChar);
+            currentToken = processSingleCharacterToken(currentChar);
+    }
 
-        return token;
+    public Token nextToken() {
+        Token tempToken = currentToken;
+
+        getNextToken();
+
+        return tempToken;
+    }
+
+    public Token peek() {
+        return currentToken;
     }
 
     private Token ErrorToken(char currentChar) {

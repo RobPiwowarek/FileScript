@@ -47,7 +47,7 @@ class Source {
     Source(InputStream source) {
         this.source = source;
 
-        nextChar();
+        getNextChar();
     }
 
     Source(File fileSource) {
@@ -58,7 +58,7 @@ class Source {
             throw new RuntimeException(e);
         }
 
-        nextChar();
+        getNextChar();
     }
 
     boolean isEoF() {

@@ -1,4 +1,4 @@
-package parser.ast.instruction.definition;
+package parser.ast.instruction.definition.variable;
 
 import parser.ast.Node;
 import parser.ast.Type;
