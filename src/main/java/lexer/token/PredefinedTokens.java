@@ -5,24 +5,24 @@ public class PredefinedTokens {
         public static final Token ASSIGN = new Token(TokenType.ASSIGN_OP, "=");
 
         public static final class Logical {
-            public static final Token AND = new Token(TokenType.LOGICAL_OP, "&&");
-            public static final Token OR = new Token(TokenType.LOGICAL_OP, "||");
+            public static final Token AND = new Token(TokenType.AND, "&&");
+            public static final Token OR = new Token(TokenType.OR, "||");
         }
 
         public static final class Relational {
-            public static final Token EQUAL = new Token(TokenType.RELATIONAL_OP, "==");
-            public static final Token NOT_EQUAL = new Token(TokenType.RELATIONAL_OP, "!=");
-            public static final Token LESS = new Token(TokenType.RELATIONAL_OP, "<");
-            public static final Token LESS_EQUAL = new Token(TokenType.RELATIONAL_OP, "<=");
-            public static final Token GREATER = new Token(TokenType.RELATIONAL_OP, ">");
-            public static final Token GREATER_EQUAL = new Token(TokenType.RELATIONAL_OP, ">=");
+            public static final Token EQUAL = new Token(TokenType.EQUAL, "==");
+            public static final Token NOT_EQUAL = new Token(TokenType.NOT_EQUAL, "!=");
+            public static final Token LESS = new Token(TokenType.LESS, "<");
+            public static final Token LESS_EQUAL = new Token(TokenType.LESS_EQUAL, "<=");
+            public static final Token GREATER = new Token(TokenType.GREATER, ">");
+            public static final Token GREATER_EQUAL = new Token(TokenType.GREATER_EQUAL, ">=");
         }
 
         public static final class Arithmetic {
-            public static final Token PLUS = new Token(TokenType.ARITHMETIC_OP, "+");
-            public static final Token MINUS = new Token(TokenType.ARITHMETIC_OP, "-");
-            public static final Token MULTIPLY = new Token(TokenType.ARITHMETIC_OP, "*");
-            public static final Token DIVIDE = new Token(TokenType.ARITHMETIC_OP, "/");
+            public static final Token PLUS = new Token(TokenType.PLUS, "+");
+            public static final Token MINUS = new Token(TokenType.MINUS, "-");
+            public static final Token MULTIPLY = new Token(TokenType.MULTIPLY, "*");
+            public static final Token DIVIDE = new Token(TokenType.DIVIDE, "/");
         }
     }
 
