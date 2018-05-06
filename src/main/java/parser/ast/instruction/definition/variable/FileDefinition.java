@@ -10,11 +10,10 @@ public class FileDefinition extends VariableDefinition {
      private Type type;
      private List<FileAttribute> attributes;
 
-     public FileDefinition(String name, Type type, Node value, List<FileAttribute> attributes) {
+     public FileDefinition(String name, Type type, List<FileAttribute> attributes) {
           this.type = type;
           this.attributes = attributes;
           super.name = name;
-          super.value = value;
      }
 
      public Type getType() {

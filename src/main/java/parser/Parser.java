@@ -10,15 +10,17 @@ import parser.ast.instruction.Instruction;
 import parser.ast.instruction.assignment.Assignment;
 import parser.ast.instruction.call.FunctionCall;
 import parser.ast.instruction.call.Return;
+import parser.ast.instruction.conditional.Else;
 import parser.ast.instruction.conditional.If;
 import parser.ast.instruction.definition.function.FunctionArgument;
 import parser.ast.instruction.definition.function.FunctionDefinition;
+import parser.ast.instruction.definition.variable.ArrayDefinition;
+import parser.ast.instruction.definition.variable.FileAttribute;
+import parser.ast.instruction.definition.variable.FileDefinition;
+import parser.ast.instruction.definition.variable.PrimitiveDefinition;
 import parser.ast.instruction.expression.Expression;
 import parser.ast.instruction.loop.Foreach;
-import parser.ast.instruction.value.ConstBool;
-import parser.ast.instruction.value.ConstDate;
-import parser.ast.instruction.value.ConstInt;
-import parser.ast.instruction.value.ConstString;
+import parser.ast.instruction.value.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,19 +74,80 @@ public class Parser {
     }
 
     private Instruction parseFunctionDefinition() throws Exception {
-        return new FunctionDefinition();
+        accept(TokenType.DEF);
+        Identifier identifier = new Identifier(current.getValue());
+        accept(TokenType.IDENTIFIER);
+        accept(TokenType.OPEN_BRACE);
+        List<FunctionArgument> arguments = parseFunctionArguments();
+        accept(TokenType.ASSIGN_OP);
+        accept(TokenType.OPEN_CURLY_BRACE);
+
+        Program body = new Program();
+
+        while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+            body.addInstruction(parseInstruction());
+
+        accept(TokenType.CLOSED_CURLY_BRACE);
+
+        return new FunctionDefinition(identifier, arguments, body);
     }
 
     private Instruction parseIf() throws Exception {
-        return new If();
+        accept(TokenType.IF);
+        accept(TokenType.OPEN_BRACE);
+
+        Node expression = parseExpression();
+
+        accept(TokenType.CLOSED_BRACE);
+
+        Program body = new Program();
+
+        accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
+        while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+            body.addInstruction(parseInstruction());
+
+        accept(TokenType.CLOSED_CURLY_BRACE);
+
+        Else elseBlock = null;
+
+        if (current.getType() == TokenType.ELSE) {
+            accept(TokenType.ELSE);
+
+            Program elseBody = new Program();
+
+            accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
+            while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+                elseBody.addInstruction(parseInstruction());
+
+            elseBlock = new Else(elseBody);
+        }
+
+        return new If(expression, body, elseBlock);
     }
 
     private Instruction parseForeach() throws Exception {
-        return new Foreach();
+        accept(TokenType.FOREACH);
+
+        Identifier iterator = new Identifier(current.getValue());
+
+        accept(TokenType.IDENTIFIER);
+
+        Identifier collection = new Identifier(current.getValue());
+
+        accept(TokenType.IDENTIFIER);
+
+        Program body = new Program();
+
+        accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
+        while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+            body.addInstruction(parseInstruction());
+
+        return new Foreach(iterator, collection, body);
     }
 
     private Instruction parseReturn() throws Exception {
-        return new Return();
+        accept(TokenType.RETURN);
+        return new Return(parseExpression());
     }
 
     private Instruction parseVariableDefinitionFunctionCallOrAssignment() throws Exception {
@@ -108,7 +171,108 @@ public class Parser {
     }
 
     private Instruction parseVariableDefinition(Identifier identifier) throws Exception {
+        accept(TokenType.COLON);
 
+        Type type = null;
+
+        switch (current.getType()) {
+            case OPEN_SQUARE_BRACE:
+                accept(TokenType.OPEN_SQUARE_BRACE);
+                int count = 0;
+                if (current.getType() == TokenType.CONST_INT) {
+                    count = Integer.parseInt(current.getValue());
+                    accept(TokenType.CONST_INT);
+                }
+                accept(TokenType.CLOSED_SQUARE_BRACE);
+
+                type = parseType(current);
+
+                accept(TokenType.INT_TYPE, TokenType.BOOL_TYPE, TokenType.STRING_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
+
+                accept(TokenType.ASSIGN_OP);
+
+                Node node;
+
+                if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
+                    node = parseConstArray();
+                else
+                    node = parseIdentifierOrFunctionCall();
+
+                return new ArrayDefinition(identifier.getName(), type, node, count);
+            case FILE_TYPE:
+                type = Type.FILE;
+            case CATALOGUE_TYPE:
+                if (type == null)
+                    type = Type.CATALOGUE;
+
+                accept(TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
+                accept(TokenType.ASSIGN_OP);
+                accept(TokenType.OPEN_CURLY_BRACE);
+
+                ArrayList<FileAttribute> attributes = new ArrayList<>();
+
+                Token temp = current;
+                while (accept(TokenType.IDENTIFIER)) {
+                    Node value;
+                    accept(TokenType.COLON);
+
+                    if (current.getType() == TokenType.IDENTIFIER) {
+                        value = new Identifier(current.getValue());
+                        accept(TokenType.IDENTIFIER);
+                    }
+                    else {
+                        value = parseConstValue();
+                    }
+
+                    attributes.add(new FileAttribute(temp.getValue(), value));
+
+                    temp = current;
+                }
+
+                accept(TokenType.CLOSED_CURLY_BRACE);
+                return new FileDefinition(identifier.getName(), type, attributes);
+            case INT_TYPE:
+                type = Type.INT;
+            case STRING_TYPE:
+                if (type == null) type = Type.STRING;
+            case BOOL_TYPE:
+                if (type == null) type = Type.BOOL;
+            case DATE_TYPE:
+                if (type == null) type = Type.DATE;
+                accept(TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.DATE_TYPE);
+                accept(TokenType.ASSIGN_OP);
+
+                Node val;
+
+                if (current.getType() == TokenType.IDENTIFIER) {
+                    val = new Identifier(current.getValue());
+                    accept(TokenType.IDENTIFIER);
+                }
+                else {
+                    val = parseConstValue();
+                }
+                return new PrimitiveDefinition(identifier.getName(), type, val);
+            default:
+                throw new RuntimeException("expected [ or valid type"); // todo:
+        }
+    }
+
+    private ConstArray parseConstArray() throws Exception {
+        accept(TokenType.OPEN_SQUARE_BRACE);
+        ArrayList<String> values = new ArrayList<>();
+
+        Token temp = current;
+        while (accept(TokenType.CONST_INT, TokenType.CONST_STRING, TokenType.CONST_BOOL)) {
+            values.add(temp.getValue());
+
+            accept(TokenType.COMMA);
+
+            temp = current;
+        }
+
+        accept(TokenType.CLOSED_SQUARE_BRACE);
+
+        return new ConstArray(values);
     }
 
     private Instruction parseAssignment(Identifier identifier) throws Exception {
@@ -207,28 +371,7 @@ public class Parser {
                 FunctionArgument argument = null; // fixme
 
                 if (accept(TokenType.COLON)) {
-                    switch (current.getType()) {
-                        case INT_TYPE:
-                            argument = new FunctionArgument(Type.INT, identifier);
-                            break;
-                        case STRING_TYPE:
-                            argument = new FunctionArgument(Type.STRING, identifier);
-                            break;
-                        case BOOL_TYPE:
-                            argument = new FunctionArgument(Type.BOOL, identifier);
-                            break;
-                        case DATE_TYPE:
-                            argument = new FunctionArgument(Type.DATE, identifier);
-                            break;
-                        case FILE_TYPE:
-                            argument = new FunctionArgument(Type.FILE, identifier);
-                            break;
-                        case CATALOGUE_TYPE:
-                            argument = new FunctionArgument(Type.CATALOGUE, identifier);
-                            break;
-                        default:
-                            throw new RuntimeException("expected valid type"); // todo: empty node??
-                    }
+                    argument = new FunctionArgument(parseType(current), identifier);
                 }
 
                 accept(TokenType.COMMA); // todo:
@@ -271,6 +414,25 @@ public class Parser {
                 return new ConstString(string);
             default:
                 throw new RuntimeException("expected const value"); // todo:
+        }
+    }
+
+    private Type parseType(Token token) throws Exception {
+        switch (token.getType()) {
+            case INT_TYPE:
+                return Type.INT;
+            case STRING_TYPE:
+                return Type.STRING;
+            case BOOL_TYPE:
+                return Type.BOOL;
+            case DATE_TYPE:
+                return Type.DATE;
+            case FILE_TYPE:
+                return Type.FILE;
+            case CATALOGUE_TYPE:
+                return Type.CATALOGUE;
+            default:
+                throw new RuntimeException("expected valid type"); // todo: empty node??
         }
     }
 }

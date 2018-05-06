@@ -10,5 +10,5 @@ public class ConstDate extends ConstValue {
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("DD'/'MM'/'YYYY");
     private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
 
-    DateTim
+
 }

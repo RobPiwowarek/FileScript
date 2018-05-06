@@ -6,4 +6,8 @@ public class Identifier extends Node {
     public Identifier(String name) {
         this.name = name;
     }
+
+    public String getName() {
+        return name;
+    }
 }
