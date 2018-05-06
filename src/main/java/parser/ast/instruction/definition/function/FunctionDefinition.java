@@ -2,7 +2,6 @@ package parser.ast.instruction.definition.function;
 
 import parser.Program;
 import parser.ast.Identifier;
-import parser.ast.Node;
 import parser.ast.instruction.definition.Definition;
 
 import java.util.List;

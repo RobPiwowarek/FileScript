@@ -1,23 +1,22 @@
 package parser.ast.instruction.definition.variable;
 
 import parser.ast.Node;
-import parser.ast.Type;
 
 // attribute = identifier ':' (constValue | identifier)
 public class FileAttribute extends Node {
-     private String name;
-     private Node value;
+    private String name;
+    private Node value;
 
-     public FileAttribute(String name, Node value) {
-          this.name = name;
-          this.value = value;
-     }
+    public FileAttribute(String name, Node value) {
+        this.name = name;
+        this.value = value;
+    }
 
-     public String getName() {
-          return name;
-     }
+    public String getName() {
+        return name;
+    }
 
-     public Node getValue() {
-          return value;
-     }
+    public Node getValue() {
+        return value;
+    }
 }

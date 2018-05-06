@@ -84,7 +84,7 @@ public class Parser {
 
         Program body = new Program();
 
-        while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+        while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
             body.addInstruction(parseInstruction());
 
         accept(TokenType.CLOSED_CURLY_BRACE);
@@ -103,7 +103,7 @@ public class Parser {
         Program body = new Program();
 
         accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
-        while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+        while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
             body.addInstruction(parseInstruction());
 
         accept(TokenType.CLOSED_CURLY_BRACE);
@@ -116,7 +116,7 @@ public class Parser {
             Program elseBody = new Program();
 
             accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
-            while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+            while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
                 elseBody.addInstruction(parseInstruction());
 
             elseBlock = new Else(elseBody);
@@ -139,7 +139,7 @@ public class Parser {
         Program body = new Program();
 
         accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
-        while(current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+        while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
             body.addInstruction(parseInstruction());
 
         return new Foreach(iterator, collection, body);
@@ -219,8 +219,7 @@ public class Parser {
                     if (current.getType() == TokenType.IDENTIFIER) {
                         value = new Identifier(current.getValue());
                         accept(TokenType.IDENTIFIER);
-                    }
-                    else {
+                    } else {
                         value = parseConstValue();
                     }
 
@@ -247,8 +246,7 @@ public class Parser {
                 if (current.getType() == TokenType.IDENTIFIER) {
                     val = new Identifier(current.getValue());
                     accept(TokenType.IDENTIFIER);
-                }
-                else {
+                } else {
                     val = parseConstValue();
                 }
                 return new PrimitiveDefinition(identifier.getName(), type, val);
