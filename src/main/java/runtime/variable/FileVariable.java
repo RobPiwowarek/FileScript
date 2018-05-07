@@ -10,35 +10,48 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class FileVariable extends Variable implements Schedulable {
-    private String name;
-    private Program updateBody;
-    private File file;
-    private Scope scope;
-    private boolean isOpened = false;
+    protected String name;
+    protected Program updateBody;
+    protected File file;
+    protected Scope scope;
+    protected boolean isOpened = false;
 
-    public FileVariable(String name, Scope scope) {
-        this.name = name;
+    public FileVariable(Scope scope) {
         this.scope = scope;
-
-        file = new File(name);
-        if (!file.exists())
-            throw new RuntimeException("File named: " + name + " does not exist");
     }
 
     public boolean open() {
         if (!isOpened)
             isOpened = true;
 
+        if (file == null || !file.exists())
+            throw new RuntimeException("File named: " + name + " does not exist");
+        else
+            file = new File(name);
+
         return true;
     }
 
+    // todo: what if file == null
     public boolean close() {
         if (isOpened) {
             isOpened = false;
             return true;
-        }
-        else
+        } else
             return false;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void create() {
+        try {
+            if (!file.exists())
+                file.createNewFile(); // todo:
+        } catch (IOException e) {
+            e.printStackTrace(); // todo:
+        }
     }
 
     public boolean rename(String newName) {

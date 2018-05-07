@@ -1,8 +1,11 @@
 package parser.ast.instruction.definition.function;
 
 import parser.Program;
+import parser.Scope;
 import parser.ast.Identifier;
 import parser.ast.instruction.definition.Definition;
+import runtime.variable.Variable;
+import runtime.variable.VoidVariable;
 
 import java.util.List;
 
@@ -28,5 +31,10 @@ public class FunctionDefinition extends Definition {
 
     public Program getBody() {
         return body;
+    }
+
+    @Override
+    public Variable execute(Scope scope) {
+        return VoidVariable.getInstance(); // todo: runtime'owa reprezentacja funkcji
     }
 }

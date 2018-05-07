@@ -1,5 +1,8 @@
 package parser.ast;
 
+import parser.Scope;
+import runtime.variable.Variable;
+
 public class Identifier extends Node {
     String name;
 
@@ -9,5 +12,10 @@ public class Identifier extends Node {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Variable execute(Scope scope) {
+        return scope.getVariable(name);
     }
 }

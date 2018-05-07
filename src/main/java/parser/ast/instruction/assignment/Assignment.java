@@ -1,10 +1,11 @@
 package parser.ast.instruction.assignment;
 
 import parser.Scope;
-import parser.ast.Executable;
 import parser.ast.Identifier;
 import parser.ast.Node;
 import parser.ast.instruction.Instruction;
+import runtime.variable.Variable;
+import runtime.variable.VoidVariable;
 
 // assignment = identifier assignmentOperator assignableExpression
 public class Assignment extends Instruction {
@@ -25,8 +26,7 @@ public class Assignment extends Instruction {
     }
 
     @Override
-    public Executable execute(Scope scope) {
-        if (expression instanceof Executable)
-            ((Executable) expression).execute(scope);
+    public Variable execute(Scope scope) {
+        return VoidVariable.getInstance(); // todo:
     }
 }

@@ -1,8 +1,6 @@
 package parser;
 
 import parser.ast.Identifier;
-import parser.ast.Node;
-import parser.ast.instruction.definition.function.FunctionDefinition;
 import runtime.variable.Variable;
 
 import java.util.Map;
@@ -21,7 +19,19 @@ public class Scope {
         }
     }
 
-    public Program getFunctionBody(Identifier identifier){
+    public void updateVariable(final String identifier, Variable newValue) {
+        variables.replace(identifier, newValue);
+    }
+
+    public Variable getVariable(final String identifier) {
+        return variables.get(identifier);
+    }
+
+    public Program getFunction(final String identifier) {
+        return functions.get(identifier);
+    }
+
+    public Program getFunctionBody(Identifier identifier) {
         Program body = functions.get(identifier.getName());
 
         if (body == null)
@@ -30,5 +40,22 @@ public class Scope {
             return body;
     }
 
+    private boolean containsVariable(String identifier) {
+        boolean contains = false;
+
+        if (parent != null)
+            contains = parent.containsVariable(identifier);
+
+        return contains || variables.containsKey(identifier);
+    }
+
+    private boolean containsFunction(String identifier) {
+        boolean contains = false;
+
+        if (parent != null)
+            contains = parent.containsFunction(identifier);
+
+        return contains || functions.containsKey(identifier);
+    }
 
 }

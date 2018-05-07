@@ -1,6 +1,5 @@
 package parser;
 
-import parser.ast.Executable;
 import parser.ast.instruction.Instruction;
 
 import java.util.ArrayList;
@@ -13,9 +12,9 @@ public class Program {
         body.add(instruction);
     }
 
-    public void executeInstructions(Scope scope){
-        body.stream()
-                .map(instruction -> (Executable) instruction)
-                .forEach(instruction -> instruction.execute(scope));
+    public void executeInstructions(Scope scope) {
+        for (Instruction instruction : body) {
+            instruction.execute(scope);
+        }
     }
 }

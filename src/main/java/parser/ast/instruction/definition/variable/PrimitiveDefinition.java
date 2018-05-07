@@ -1,12 +1,10 @@
 package parser.ast.instruction.definition.variable;
 
 import parser.Scope;
-import parser.ast.Executable;
 import parser.ast.Node;
 import parser.ast.Type;
-import runtime.variable.BoolVariable;
-import runtime.variable.DateVariable;
-import runtime.variable.StringVariable;
+import runtime.variable.Variable;
+import runtime.variable.VoidVariable;
 
 // primitiveOrDateDefinition = (simpleType | dateType) assignmentOperator (constValue | identifier)
 public class PrimitiveDefinition extends VariableDefinition {
@@ -19,38 +17,18 @@ public class PrimitiveDefinition extends VariableDefinition {
     }
 
     @Override
-    public Executable execute(Scope scope) {
-
-
+    public Variable execute(Scope scope) {
         switch (type) {
             case INT:
             case BOOL:
-                BoolVariable bool;
-
-                if(value instanceof Executable)
-                    bool = ((Executable) value).execute(scope);
-
-                scope.addVariable(super.name, bool);
-                break;
             case STRING:
-                StringVariable string;
-
-                if(value instanceof Executable)
-                    string = ((Executable) value).execute(scope);
-
-                scope.addVariable(super.name, string);
-                break;
             case DATE:
-                DateVariable date;
-
-                if(value instanceof Executable)
-                    date = ((Executable) value).execute(scope);
-
-                scope.addVariable(super.name, date);
+                scope.addVariable(super.name, value.execute(scope));
                 break;
             default:
                 throw new RuntimeException("Error: Expected primitive type");
         }
+        return VoidVariable.getInstance();
     }
 
     public Type getType() {

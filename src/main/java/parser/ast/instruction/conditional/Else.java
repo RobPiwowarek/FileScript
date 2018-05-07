@@ -3,7 +3,7 @@ package parser.ast.instruction.conditional;
 import parser.Program;
 
 // ["else" instructionBlock]
-class Else {
+public class Else {
     private Program body;
 
     public Else(Program body) {

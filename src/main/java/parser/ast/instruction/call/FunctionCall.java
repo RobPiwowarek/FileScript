@@ -1,10 +1,11 @@
 package parser.ast.instruction.call;
 
 import parser.Scope;
-import parser.ast.Executable;
 import parser.ast.Identifier;
 import parser.ast.instruction.Instruction;
 import parser.ast.instruction.definition.function.FunctionArgument;
+import runtime.variable.Variable;
+import runtime.variable.VoidVariable;
 
 import java.util.List;
 
@@ -19,8 +20,8 @@ public class FunctionCall extends Instruction {
     }
 
     @Override
-    public Executable execute(Scope scope) {
-        scope.getFunctionBody(identifier).executeInstructions(scope);
+    public Variable execute(Scope scope) {
+        return VoidVariable.getInstance(); // todo runtime'owa reprezentacja funkcji
     }
 
     public List<FunctionArgument> getArguments() {

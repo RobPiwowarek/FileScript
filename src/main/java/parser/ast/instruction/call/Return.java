@@ -1,9 +1,9 @@
 package parser.ast.instruction.call;
 
 import parser.Scope;
-import parser.ast.Executable;
 import parser.ast.Node;
 import parser.ast.instruction.Instruction;
+import runtime.variable.Variable;
 
 // return = "return" expression
 public class Return extends Instruction {
@@ -18,9 +18,7 @@ public class Return extends Instruction {
     }
 
     @Override
-    public Executable execute(Scope scope) {
-        if (expression instanceof Executable)
-            ((Executable) expression).execute(scope);
+    public Variable execute(Scope scope) {
+        return expression.execute(scope);
     }
-
 }

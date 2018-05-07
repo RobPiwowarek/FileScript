@@ -2,9 +2,11 @@ package parser.ast.instruction.conditional;
 
 import parser.Program;
 import parser.Scope;
-import parser.ast.Executable;
 import parser.ast.Node;
 import parser.ast.instruction.Instruction;
+import runtime.variable.BoolVariable;
+import runtime.variable.Variable;
+import runtime.variable.VoidVariable;
 
 // if = "if" '('expression')' instructionBlock ["else" instructionBlock]
 public class If extends Instruction {
@@ -19,17 +21,17 @@ public class If extends Instruction {
     }
 
     @Override
-    public void execute(Scope scope) {
-        boolean isTrue = false;
+    public Variable execute(Scope scope) {
+        boolean isTrue;
 
-        if (expression instanceof Executable)
-            isTrue = ((Executable) expression).execute(scope);
+        isTrue = ((BoolVariable) expression.execute(scope)).getValue();
 
         if (isTrue)
             body.executeInstructions(scope);
-        else
-            if(elseBlock != null)
-                elseBlock.getBody().executeInstructions(scope);
+        else if (elseBlock != null)
+            elseBlock.getBody().executeInstructions(scope);
+
+        return VoidVariable.getInstance();
     }
 
     public Node getExpression() {

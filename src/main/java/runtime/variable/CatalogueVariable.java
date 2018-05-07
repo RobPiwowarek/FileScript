@@ -1,66 +1,62 @@
 package runtime.variable;
 
-import parser.Program;
 import parser.Scope;
 import runtime.Schedulable;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
-public class CatalogueVariable extends Variable implements Schedulable {
-    private String name;
-    private Program updateBody;
-    private File file;
-    private Scope scope;
-    private List<FileVariable> subdirectories;
-    private boolean isOpened = false;
+public class CatalogueVariable extends FileVariable implements Schedulable {
+    private List<CatalogueVariable> subdirectories;
+    private List<FileVariable> files;
 
-    public CatalogueVariable(String name, Scope scope) {
-        this.name = name;
-        this.scope = scope;
-
-        file = new File(name);
+    public CatalogueVariable(Scope scope) {
+        super(scope);
+        subdirectories = new ArrayList<>();
+        files = new ArrayList<>();
     }
 
-    public boolean open() {
-        if (!isOpened)
-            isOpened = true;
-
-        return true;
+    public List<CatalogueVariable> getSubdirectories() {
+        return subdirectories;
     }
 
-    public boolean close() {
-        if (isOpened) {
-            isOpened = false;
-            return true;
-        }
-        else
-            return false;
+    public void setSubdirectories(List<CatalogueVariable> subdirectories) {
+        this.subdirectories = subdirectories;
     }
 
-    public boolean rename(String newName) {
-        return file.renameTo(new File(newName));
-    }
-
-    public boolean copyTo(String destination) {
-        try {
-            Files.copy(file.toPath(), Paths.get(destination));
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace(); // todo:
-            return false;
+    public void addSubdirectories(List<Variable> variables) {
+        for (Variable subdir : variables) {
+            subdirectories.add((CatalogueVariable) subdir);
         }
     }
 
-    public void setUpdateBody(Program updateBody) {
-        this.updateBody = updateBody;
+    public void addFiles(List<Variable> variables) {
+        for (Variable file : variables) {
+            files.add((FileVariable) file);
+        }
+    }
+
+    public List<FileVariable> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<FileVariable> files) {
+        this.files = files;
     }
 
     @Override
-    public void update() {
-        updateBody.executeInstructions(scope);
+    public void create() {
+        if (!isOpened)
+            return;
+
+        super.file.mkdir();
+
+        for (FileVariable file : files) {
+            file.create();
+        }
+
+        for (CatalogueVariable subdir : subdirectories) {
+            subdir.create();
+        }
     }
 }

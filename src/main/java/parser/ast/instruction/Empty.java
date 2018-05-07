@@ -1,8 +1,8 @@
 package parser.ast.instruction;
 
 import parser.Scope;
-import parser.ast.Executable;
-import parser.ast.Node;
+import runtime.variable.Variable;
+import runtime.variable.VoidVariable;
 
 public class Empty extends Instruction {
     private static Empty instance;
@@ -15,7 +15,7 @@ public class Empty extends Instruction {
     }
 
     @Override
-    public Executable execute(Scope scope) {
-        return null;
+    public Variable execute(Scope scope) {
+        return VoidVariable.getInstance();
     }
 }

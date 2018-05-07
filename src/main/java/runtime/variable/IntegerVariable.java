@@ -20,7 +20,7 @@ public class IntegerVariable extends Variable {
         return value.toString();
     }
 
-    public IntegerVariable add(IntegerVariable variable){
+    public IntegerVariable add(IntegerVariable variable) {
         return new IntegerVariable(variable.getValue() + value);
     }
 
