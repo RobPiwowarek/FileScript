@@ -46,14 +46,33 @@ public class Parser {
         return program;
     }
 
-    private boolean accept(final TokenType... types) throws Exception {
-        for (final TokenType type : types) {
-            if (type.equals(current.getType())) {
-                current = lexer.nextToken();
-                return true;
-            }
+    private void accept(final TokenType... types) throws Exception {
+        if (isAcceptable(types))
+            current = lexer.nextToken();
+        else {
+            final String errorMessage = createErrorMessage(types);
+            System.out.println(errorMessage);
+            throw new Exception(errorMessage);
         }
-        return false;
+    }
+
+    private String createErrorMessage(final TokenType... types) {
+        StringBuilder stringBuilder = new StringBuilder()
+                .append("Error: ")
+                .append("Unexpected token: ")
+                .append(current.getValue())
+                .append(" in line: ")
+                .append(lexer.getLineNumber())
+                .append(" at position: ")
+                .append(lexer.getPositionInLine())
+                .append(" Expected: ");
+
+        for (final TokenType tokenType : types) {
+            stringBuilder.append(tokenType);
+            stringBuilder.append(" ");
+        }
+
+        return stringBuilder.toString();
     }
 
     private Instruction parseInstruction() throws Exception {
@@ -69,7 +88,7 @@ public class Parser {
             case RETURN:
                 return parseReturn();
             default:
-                throw new Exception(); // todo:
+                throw new RuntimeException(createErrorMessage(TokenType.DEF, TokenType.IF, TokenType.FOREACH, TokenType.IDENTIFIER, TokenType.RETURN)); // todo:
         }
     }
 
@@ -82,12 +101,7 @@ public class Parser {
         accept(TokenType.ASSIGN_OP);
         accept(TokenType.OPEN_CURLY_BRACE);
 
-        Program body = new Program();
-
-        while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
-            body.addInstruction(parseInstruction());
-
-        accept(TokenType.CLOSED_CURLY_BRACE);
+        Program body = parseInstructionBlock();
 
         return new FunctionDefinition(identifier, arguments, body);
     }
@@ -100,29 +114,14 @@ public class Parser {
 
         accept(TokenType.CLOSED_BRACE);
 
-        Program body = new Program();
-
-        accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
-        while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
-            body.addInstruction(parseInstruction());
-
-        accept(TokenType.CLOSED_CURLY_BRACE);
-
-        Else elseBlock = null;
+        Program body = parseInstructionBlock();
 
         if (current.getType() == TokenType.ELSE) {
             accept(TokenType.ELSE);
-
-            Program elseBody = new Program();
-
-            accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
-            while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
-                elseBody.addInstruction(parseInstruction());
-
-            elseBlock = new Else(elseBody);
+            return new If(expression, body, new Else(parseInstructionBlock()));
         }
 
-        return new If(expression, body, elseBlock);
+        return new If(expression, body, null);
     }
 
     private Instruction parseForeach() throws Exception {
@@ -136,11 +135,7 @@ public class Parser {
 
         accept(TokenType.IDENTIFIER);
 
-        Program body = new Program();
-
-        accept(TokenType.OPEN_CURLY_BRACE); // todo: make a separate function out of it
-        while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
-            body.addInstruction(parseInstruction());
+        Program body = parseInstructionBlock();
 
         return new Foreach(iterator, collection, body);
     }
@@ -162,7 +157,7 @@ public class Parser {
             case OPEN_BRACE:
                 return parseFunctionCall(identifier);
             default:
-                throw new Exception(); // todo:
+                throw new RuntimeException(createErrorMessage(TokenType.COLON, TokenType.ASSIGN_OP, TokenType.OPEN_BRACE));
         }
     }
 
@@ -173,111 +168,98 @@ public class Parser {
     private Instruction parseVariableDefinition(Identifier identifier) throws Exception {
         accept(TokenType.COLON);
 
-        Type type = null;
-
         switch (current.getType()) {
             case OPEN_SQUARE_BRACE:
-                accept(TokenType.OPEN_SQUARE_BRACE);
-                int count = 0;
-                if (current.getType() == TokenType.CONST_INT) {
-                    count = Integer.parseInt(current.getValue());
-                    accept(TokenType.CONST_INT);
-                }
-                accept(TokenType.CLOSED_SQUARE_BRACE);
-
-                type = parseType(current);
-
-                accept(TokenType.INT_TYPE, TokenType.BOOL_TYPE, TokenType.STRING_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
-
-                accept(TokenType.ASSIGN_OP);
-
-                Node node;
-
-                if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
-                    node = parseConstArray();
-                else
-                    node = parseIdentifierOrFunctionCall();
-
-                return new ArrayDefinition(identifier.getName(), type, node, count);
+                return parseArrayDefinition(identifier);
             case FILE_TYPE:
-                type = Type.FILE;
             case CATALOGUE_TYPE:
-                if (type == null)
-                    type = Type.CATALOGUE;
-
-                accept(TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
-                accept(TokenType.ASSIGN_OP);
-                accept(TokenType.OPEN_CURLY_BRACE);
-
-                ArrayList<FileAttribute> attributes = new ArrayList<>();
-
-                Token temp = current;
-                while (accept(TokenType.IDENTIFIER)) {
-                    Node value;
-                    accept(TokenType.COLON);
-
-                    if (current.getType() == TokenType.IDENTIFIER) {
-                        value = new Identifier(current.getValue());
-                        accept(TokenType.IDENTIFIER);
-                    } else {
-                        value = parseConstValue();
-                    }
-
-                    attributes.add(new FileAttribute(temp.getValue(), value));
-
-                    temp = current;
-                }
-
-                accept(TokenType.CLOSED_CURLY_BRACE);
-                return new FileDefinition(identifier.getName(), type, attributes);
+                return parseFileDefinition(identifier);
             case INT_TYPE:
-                type = Type.INT;
             case STRING_TYPE:
-                if (type == null) type = Type.STRING;
             case BOOL_TYPE:
-                if (type == null) type = Type.BOOL;
             case DATE_TYPE:
-                if (type == null) type = Type.DATE;
-                accept(TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.DATE_TYPE);
-                accept(TokenType.ASSIGN_OP);
-
-                Node val;
-
-                if (current.getType() == TokenType.IDENTIFIER) {
-                    val = new Identifier(current.getValue());
-                    accept(TokenType.IDENTIFIER);
-                } else {
-                    val = parseConstValue();
-                }
-                return new PrimitiveDefinition(identifier.getName(), type, val);
+                return parsePrimitiveDefinition(identifier);
             default:
-                throw new RuntimeException("expected [ or valid type"); // todo:
+                throw new RuntimeException(createErrorMessage(TokenType.OPEN_SQUARE_BRACE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE, TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.DATE_TYPE));
         }
+    }
+
+    private Instruction parseArrayDefinition(Identifier identifier) throws Exception {
+        accept(TokenType.OPEN_SQUARE_BRACE);
+        int count = 0;
+        if (current.getType() == TokenType.CONST_INT) {
+            count = Integer.parseInt(current.getValue());
+            accept(TokenType.CONST_INT);
+        }
+        accept(TokenType.CLOSED_SQUARE_BRACE);
+
+        Type type = parseType(current);
+
+        accept(TokenType.INT_TYPE, TokenType.BOOL_TYPE, TokenType.STRING_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
+        accept(TokenType.ASSIGN_OP);
+
+        if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
+            return new ArrayDefinition(identifier.getName(), type, parseConstArray(), count);
+        else
+            return new ArrayDefinition(identifier.getName(), type, parseIdentifierOrFunctionCall(), count);
+    }
+
+    private Instruction parseFileDefinition(Identifier identifier) throws Exception {
+        Type type = parseType(current);
+        accept(TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
+        accept(TokenType.ASSIGN_OP);
+        accept(TokenType.OPEN_CURLY_BRACE);
+
+        ArrayList<FileAttribute> attributes = new ArrayList<>();
+
+        while (isAcceptable(TokenType.IDENTIFIER)) {
+            String name = current.getValue();
+            accept(TokenType.IDENTIFIER);
+            accept(TokenType.COLON);
+
+            attributes.add(new FileAttribute(name, parseIdentifierOrConstValue()));
+        }
+
+        accept(TokenType.CLOSED_CURLY_BRACE);
+        return new FileDefinition(identifier.getName(), type, attributes);
+    }
+
+    private Instruction parsePrimitiveDefinition(Identifier identifier) throws Exception {
+        Type type = parseType(current);
+        accept(TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.DATE_TYPE);
+        accept(TokenType.ASSIGN_OP);
+
+        return new PrimitiveDefinition(identifier.getName(), type, parseIdentifierOrConstValue());
+    }
+
+    private Node parseIdentifierOrConstValue() throws Exception {
+        Node value;
+
+        if (current.getType() == TokenType.IDENTIFIER) {
+            value = new Identifier(current.getValue());
+            accept(TokenType.IDENTIFIER);
+            return value;
+        } else
+            return parseConstValue();
     }
 
     private ConstArray parseConstArray() throws Exception {
         accept(TokenType.OPEN_SQUARE_BRACE);
         ArrayList<String> values = new ArrayList<>();
 
-        Token temp = current;
-        while (accept(TokenType.CONST_INT, TokenType.CONST_STRING, TokenType.CONST_BOOL)) {
-            values.add(temp.getValue());
-
+        while (isAcceptable(TokenType.CONST_INT, TokenType.CONST_STRING, TokenType.CONST_BOOL)) {
+            values.add(current.getValue());
+            accept(TokenType.CONST_INT, TokenType.CONST_STRING, TokenType.CONST_BOOL);
             accept(TokenType.COMMA);
-
-            temp = current;
         }
 
         accept(TokenType.CLOSED_SQUARE_BRACE);
-
         return new ConstArray(values);
     }
 
     private Instruction parseAssignment(Identifier identifier) throws Exception {
-        if (accept(TokenType.ASSIGN_OP)) {
-            return new Assignment(parseExpression(), identifier);
-        } else
-            throw new RuntimeException("expected ="); // todo:
+        accept(TokenType.ASSIGN_OP);
+        return new Assignment(parseExpression(), identifier);
     }
 
     private Node parseExpression() throws Exception {
@@ -287,11 +269,9 @@ public class Parser {
     private Node parseLogicalExpression() throws Exception {
         Node node = parseRelationalExpression();
 
-        Token temp = current;
-        while (accept(TokenType.AND, TokenType.OR)) {
-            node = new Expression(node, temp.getType(), parseRelationalExpression());
-
-            temp = current;
+        while (isAcceptable(TokenType.AND, TokenType.OR)) {
+            node = new Expression(node, current.getType(), parseRelationalExpression());
+            accept(TokenType.AND, TokenType.OR);
         }
 
         return node;
@@ -300,14 +280,15 @@ public class Parser {
     private Node parseRelationalExpression() throws Exception {
         Node node = parseLowPriorityArithmeticExpression();
 
-        Token temp = current;
-        while (accept(
+        while (isAcceptable(
                 TokenType.LESS, TokenType.LESS_EQUAL,
                 TokenType.EQUAL, TokenType.NOT_EQUAL,
                 TokenType.GREATER, TokenType.GREATER_EQUAL)) {
-            node = new Expression(node, temp.getType(), parseLowPriorityArithmeticExpression());
+            node = new Expression(node, current.getType(), parseLowPriorityArithmeticExpression());
 
-            temp = current;
+            accept(TokenType.LESS, TokenType.LESS_EQUAL,
+                    TokenType.EQUAL, TokenType.NOT_EQUAL,
+                    TokenType.GREATER, TokenType.GREATER_EQUAL);
         }
 
         return node;
@@ -316,18 +297,26 @@ public class Parser {
     private Node parseLowPriorityArithmeticExpression() throws Exception {
         Node node = parseHighPriorityArithmeticExpression();
 
-        Token temp = current;
-        while (accept(TokenType.PLUS, TokenType.MINUS)) {
-            node = new Expression(node, temp.getType(), parseHighPriorityArithmeticExpression());
-
-            temp = current;
+        while (isAcceptable(TokenType.PLUS, TokenType.MINUS)) {
+            node = new Expression(node, current.getType(), parseHighPriorityArithmeticExpression());
+            accept(TokenType.PLUS, TokenType.MINUS);
         }
 
         return node;
     }
 
+    private boolean isAcceptable(final TokenType... types) {
+        for (final TokenType type : types) {
+            if (type.equals(current.getType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private Node parseHighPriorityArithmeticExpression() throws Exception {
-        if (accept(TokenType.OPEN_BRACE)) {
+        if (current.getType() == TokenType.OPEN_BRACE) {
+            accept(TokenType.OPEN_BRACE);
             Node node = parseExpression();
             accept(TokenType.CLOSED_BRACE);
             return node;
@@ -343,10 +332,9 @@ public class Parser {
     }
 
     private Node parseIdentifierOrFunctionCall() throws Exception {
-        Token temp = current;
-
-        if (accept(TokenType.IDENTIFIER)) {
-            Identifier identifier = new Identifier(temp.getValue());
+        if (current.getType() == TokenType.IDENTIFIER) {
+            Identifier identifier = new Identifier(current.getValue());
+            accept(TokenType.IDENTIFIER);
 
             if (current.getType() == TokenType.OPEN_BRACE) {
                 return new FunctionCall(parseFunctionArguments(), identifier);
@@ -354,32 +342,30 @@ public class Parser {
                 return identifier;
             }
         } else {
-            throw new RuntimeException("Identifier expected"); // todo:
+            throw new RuntimeException(createErrorMessage(TokenType.IDENTIFIER));
         }
     }
 
     private List<FunctionArgument> parseFunctionArguments() throws Exception {
         ArrayList<FunctionArgument> arguments = new ArrayList<>();
 
-        if (accept(TokenType.OPEN_BRACE)) {
-            Token temp = current;
+        if (current.getType() == TokenType.OPEN_BRACE) {
+            accept(TokenType.OPEN_BRACE);
 
-            while (accept(TokenType.IDENTIFIER)) {
-                Identifier identifier = new Identifier(temp.getValue());
-                FunctionArgument argument = null; // fixme
+            while (current.getType() == TokenType.IDENTIFIER) {
+                Identifier identifier = new Identifier(current.getValue());
+                accept(TokenType.IDENTIFIER);
+                FunctionArgument argument;
 
-                if (accept(TokenType.COLON)) {
-                    argument = new FunctionArgument(parseType(current), identifier);
-                }
+                accept(TokenType.COLON);
+                argument = new FunctionArgument(parseType(current), identifier);
 
-                accept(TokenType.COMMA); // todo:
+                accept(TokenType.COMMA);
                 arguments.add(argument);
-                temp = current;
             }
         }
 
-        if (!accept(TokenType.CLOSED_BRACE))
-            throw new RuntimeException("expected )"); // todo:
+        accept(TokenType.CLOSED_BRACE);
 
         return arguments;
     }
@@ -389,7 +375,6 @@ public class Parser {
             case CONST_INT:
                 String value = current.getValue();
 
-                // todo: errors
                 if (current.getType() == TokenType.DIVIDE) {
                     StringBuilder builder = new StringBuilder(value);
                     builder.append('/');
@@ -411,7 +396,7 @@ public class Parser {
                 accept(TokenType.CONST_STRING);
                 return new ConstString(string);
             default:
-                throw new RuntimeException("expected const value"); // todo:
+                throw new RuntimeException(createErrorMessage(TokenType.CONST_INT, TokenType.CONST_BOOL, TokenType.CONST_STRING));
         }
     }
 
@@ -430,7 +415,20 @@ public class Parser {
             case CATALOGUE_TYPE:
                 return Type.CATALOGUE;
             default:
-                throw new RuntimeException("expected valid type"); // todo: empty node??
+                throw new RuntimeException(createErrorMessage(TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE));
         }
+    }
+
+    private Program parseInstructionBlock() throws Exception {
+        Program body = new Program();
+
+        accept(TokenType.OPEN_CURLY_BRACE);
+
+        while (current.getType() != TokenType.CLOSED_CURLY_BRACE && current.getType() != TokenType.EOF)
+            body.addInstruction(parseInstruction());
+
+        accept(TokenType.CLOSED_CURLY_BRACE);
+
+        return body;
     }
 }

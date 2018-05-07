@@ -65,6 +65,14 @@ public class Scanner {
         return currentToken;
     }
 
+    public int getLineNumber() {
+        return source.getLineCounter();
+    }
+
+    public int getPositionInLine() {
+        return source.getCharCounter();
+    }
+
     private Token ErrorToken(char currentChar) {
         return new Token(TokenType.EMPTY, "Unexpected character " + currentChar + " at " + source.getLineCounter() + ":" + source.getCharCounter());
     }
@@ -154,5 +162,6 @@ public class Scanner {
             return ErrorToken(currentChar);
         else
             return token;
+
     }
 }
