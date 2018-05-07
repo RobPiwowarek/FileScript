@@ -1,5 +1,7 @@
 package parser.ast.instruction.call;
 
+import parser.Scope;
+import parser.ast.Executable;
 import parser.ast.Node;
 import parser.ast.instruction.Instruction;
 
@@ -14,4 +16,11 @@ public class Return extends Instruction {
     public Node getExpression() {
         return expression;
     }
+
+    @Override
+    public Executable execute(Scope scope) {
+        if (expression instanceof Executable)
+            ((Executable) expression).execute(scope);
+    }
+
 }

@@ -1,6 +1,8 @@
 package parser.ast.instruction.expression;
 
 import lexer.token.TokenType;
+import parser.Scope;
+import parser.ast.Executable;
 import parser.ast.Node;
 import parser.ast.instruction.Empty;
 
@@ -9,7 +11,7 @@ import parser.ast.instruction.Empty;
 // T2 = T3 {lowPriorityArithmeticOperator T3}
 // T3 = operand {highPriorityArithmeticOperator operand}
 // operand = identifier | constValue | functionCall | '(' expression ')'
-public class Expression extends Node {
+public class Expression extends Node implements Executable {
     Node left;
     TokenType operator;
     Node right;
@@ -26,6 +28,14 @@ public class Expression extends Node {
             this.right = Empty.getInstance();
         else
             this.right = right;
+    }
+
+    @Override
+    public void execute(Scope scope) {
+        if (left instanceof Executable) {
+            ((Executable) left).execute(scope);
+        }
+
     }
 
     public Node getLeft() {

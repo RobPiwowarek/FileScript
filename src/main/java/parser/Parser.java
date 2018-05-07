@@ -88,7 +88,7 @@ public class Parser {
             case RETURN:
                 return parseReturn();
             default:
-                throw new RuntimeException(createErrorMessage(TokenType.DEF, TokenType.IF, TokenType.FOREACH, TokenType.IDENTIFIER, TokenType.RETURN)); // todo:
+                throw new RuntimeException(createErrorMessage(TokenType.DEF, TokenType.IF, TokenType.FOREACH, TokenType.IDENTIFIER, TokenType.RETURN));
         }
     }
 

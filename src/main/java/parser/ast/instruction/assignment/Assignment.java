@@ -1,5 +1,7 @@
 package parser.ast.instruction.assignment;
 
+import parser.Scope;
+import parser.ast.Executable;
 import parser.ast.Identifier;
 import parser.ast.Node;
 import parser.ast.instruction.Instruction;
@@ -20,5 +22,11 @@ public class Assignment extends Instruction {
 
     public Node getExpression() {
         return expression;
+    }
+
+    @Override
+    public Executable execute(Scope scope) {
+        if (expression instanceof Executable)
+            ((Executable) expression).execute(scope);
     }
 }
