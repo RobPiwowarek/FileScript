@@ -44,62 +44,62 @@ public class Expression extends Node {
         switch (operator) {
             case LESS:
                 if (leftResult instanceof Comparable && rightResult instanceof Comparable)
-                    return CommonOperations.less((Comparable)leftResult, (Comparable)rightResult);
+                    return CommonOperations.less((Comparable) leftResult, (Comparable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case LESS_EQUAL:
                 if (leftResult instanceof Comparable && rightResult instanceof Comparable)
-                    return CommonOperations.lessEqual((Comparable)leftResult, (Comparable)rightResult);
+                    return CommonOperations.lessEqual((Comparable) leftResult, (Comparable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case EQUAL:
                 if (leftResult instanceof Comparable && rightResult instanceof Comparable)
-                    return CommonOperations.equal((Comparable)leftResult, (Comparable)rightResult);
+                    return CommonOperations.equal((Comparable) leftResult, (Comparable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case NOT_EQUAL:
                 if (leftResult instanceof Comparable && rightResult instanceof Comparable)
-                    return CommonOperations.notEqual((Comparable)leftResult, (Comparable)rightResult);
+                    return CommonOperations.notEqual((Comparable) leftResult, (Comparable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case GREATER:
                 if (leftResult instanceof Comparable && rightResult instanceof Comparable)
-                    return CommonOperations.greater((Comparable)leftResult, (Comparable)rightResult);
+                    return CommonOperations.greater((Comparable) leftResult, (Comparable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case GREATER_EQUAL:
                 if (leftResult instanceof Comparable && rightResult instanceof Comparable)
-                    return CommonOperations.greaterEqual((Comparable)leftResult, (Comparable)rightResult);
+                    return CommonOperations.greaterEqual((Comparable) leftResult, (Comparable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case AND:
                 if (leftResult instanceof BoolVariable && rightResult instanceof BoolVariable)
-                    return CommonOperations.and((BoolVariable)leftResult, (BoolVariable)rightResult);
+                    return CommonOperations.and((BoolVariable) leftResult, (BoolVariable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case OR:
                 if (leftResult instanceof BoolVariable && rightResult instanceof BoolVariable)
-                    return CommonOperations.or((BoolVariable)leftResult, (BoolVariable)rightResult);
+                    return CommonOperations.or((BoolVariable) leftResult, (BoolVariable) rightResult);
                 else
                     throw new RuntimeException("Incomparable types");
             case PLUS:
                 if (leftResult instanceof IntegerVariable && rightResult instanceof IntegerVariable)
-                    return CommonOperations.add((IntegerVariable)leftResult, (IntegerVariable)rightResult);
+                    return CommonOperations.add((IntegerVariable) leftResult, (IntegerVariable) rightResult);
                 else
                     throw new RuntimeException("Cannot add these types");
             case MINUS:
                 if (leftResult instanceof IntegerVariable && rightResult instanceof IntegerVariable)
-                    return CommonOperations.subtract((IntegerVariable)leftResult, (IntegerVariable)rightResult);
+                    return CommonOperations.subtract((IntegerVariable) leftResult, (IntegerVariable) rightResult);
                 else
                     throw new RuntimeException("Cannot subtract these types");
             case MULTIPLY:
                 if (leftResult instanceof IntegerVariable && rightResult instanceof IntegerVariable)
-                    return CommonOperations.multiply((IntegerVariable)leftResult, (IntegerVariable)rightResult);
+                    return CommonOperations.multiply((IntegerVariable) leftResult, (IntegerVariable) rightResult);
                 else
                     throw new RuntimeException("Cannot multiply these types");
             case DIVIDE:
                 if (leftResult instanceof IntegerVariable && rightResult instanceof IntegerVariable)
-                    return CommonOperations.add((IntegerVariable)leftResult, (IntegerVariable)rightResult);
+                    return CommonOperations.add((IntegerVariable) leftResult, (IntegerVariable) rightResult);
                 else
                     throw new RuntimeException("Cannot divide these types");
         }

@@ -4,10 +4,8 @@ import parser.Program;
 import parser.Scope;
 import parser.ast.Identifier;
 import parser.ast.Type;
-import parser.ast.instruction.definition.function.FunctionArgument;
 import runtime.variable.Variable;
 
-import java.util.List;
 import java.util.Map;
 
 public class Function {

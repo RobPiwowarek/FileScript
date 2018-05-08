@@ -39,8 +39,7 @@ public class IntegerVariable extends Variable implements Comparable {
                 return -1;
             else
                 return 0;
-        }
-        else
+        } else
             throw new RuntimeException("Error. Comparing IntegerVariable with a non-IntegerVariable type");
     }
 }
