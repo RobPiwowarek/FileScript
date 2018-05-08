@@ -1,5 +1,7 @@
 package runtime.variable;
 
-public abstract class Variable {
+import parser.ast.Type;
 
+public abstract class Variable {
+    abstract Type getType();
 }

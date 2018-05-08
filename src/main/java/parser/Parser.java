@@ -98,12 +98,15 @@ public class Parser {
         accept(TokenType.IDENTIFIER);
         accept(TokenType.OPEN_BRACE);
         List<FunctionArgument> arguments = parseFunctionArguments();
+        accept(TokenType.COLON);
+        Type returnType = parseType(current);
+        accept(TokenType.INT_TYPE, TokenType.BOOL_TYPE, TokenType.STRING_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
         accept(TokenType.ASSIGN_OP);
         accept(TokenType.OPEN_CURLY_BRACE);
 
         Program body = parseInstructionBlock();
 
-        return new FunctionDefinition(identifier, arguments, body);
+        return new FunctionDefinition(identifier, arguments, body, returnType);
     }
 
     private Instruction parseIf() throws Exception {

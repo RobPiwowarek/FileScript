@@ -9,8 +9,8 @@ import runtime.variable.VoidVariable;
 
 // argumentsWithTypes = { identifier ':' type [ ',' identifier ':' type ] }
 public class FunctionArgument extends Node {
-    Type type;
-    Identifier identifier;
+    private Type type;
+    private Identifier identifier;
 
     public FunctionArgument(Type type, Identifier identifier) {
         this.type = type;

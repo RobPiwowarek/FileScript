@@ -1,5 +1,7 @@
 package runtime.variable;
 
+import parser.ast.Type;
+
 public class StringVariable extends Variable {
     private StringBuilder value;
 
@@ -14,5 +16,10 @@ public class StringVariable extends Variable {
     @Override
     public String toString() {
         return value.toString();
+    }
+
+    @Override
+    Type getType() {
+        return Type.STRING;
     }
 }

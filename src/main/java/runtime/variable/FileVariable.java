@@ -2,6 +2,7 @@ package runtime.variable;
 
 import parser.Program;
 import parser.Scope;
+import parser.ast.Type;
 import runtime.Schedulable;
 
 import java.io.File;
@@ -75,5 +76,10 @@ public class FileVariable extends Variable implements Schedulable {
     @Override
     public void update() {
         updateBody.executeInstructions(scope);
+    }
+
+    @Override
+    Type getType() {
+        return Type.FILE;
     }
 }

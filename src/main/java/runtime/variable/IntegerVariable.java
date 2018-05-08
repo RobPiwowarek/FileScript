@@ -1,6 +1,9 @@
 package runtime.variable;
 
-public class IntegerVariable extends Variable {
+import parser.ast.Type;
+import runtime.Comparable;
+
+public class IntegerVariable extends Variable implements Comparable {
     private Integer value;
 
     public IntegerVariable(Integer value) {
@@ -20,19 +23,24 @@ public class IntegerVariable extends Variable {
         return value.toString();
     }
 
-    public IntegerVariable add(IntegerVariable variable) {
-        return new IntegerVariable(variable.getValue() + value);
+    @Override
+    Type getType() {
+        return Type.INT;
     }
 
-    public IntegerVariable multiply(IntegerVariable variable) {
-        return new IntegerVariable(variable.getValue() * value);
-    }
+    @Override
+    public int compare(Object object) {
+        if (object instanceof IntegerVariable) {
+            IntegerVariable integerVariable = (IntegerVariable) object;
 
-    public IntegerVariable divide(IntegerVariable variable) {
-        return new IntegerVariable(value / variable.getValue());
-    }
-
-    public IntegerVariable subtract(IntegerVariable variable) {
-        return new IntegerVariable(value - variable.getValue());
+            if (value > integerVariable.getValue())
+                return 1;
+            else if (value < integerVariable.getValue())
+                return -1;
+            else
+                return 0;
+        }
+        else
+            throw new RuntimeException("Error. Comparing IntegerVariable with a non-IntegerVariable type");
     }
 }

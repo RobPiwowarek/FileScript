@@ -1,5 +1,7 @@
 package runtime.variable;
 
+import parser.ast.Type;
+
 public class VoidVariable extends Variable {
     private static VoidVariable instance;
 
@@ -10,4 +12,8 @@ public class VoidVariable extends Variable {
         return instance;
     }
 
+    @Override
+    Type getType() {
+        return Type.VOID;
+    }
 }

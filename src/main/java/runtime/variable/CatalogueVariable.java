@@ -1,6 +1,7 @@
 package runtime.variable;
 
 import parser.Scope;
+import parser.ast.Type;
 import runtime.Schedulable;
 
 import java.util.ArrayList;
@@ -58,5 +59,10 @@ public class CatalogueVariable extends FileVariable implements Schedulable {
         for (CatalogueVariable subdir : subdirectories) {
             subdir.create();
         }
+    }
+
+    @Override
+    Type getType() {
+        return Type.CATALOGUE;
     }
 }
