@@ -1,14 +1,21 @@
 package parser;
 
-import parser.ast.Identifier;
+import runtime.function.Function;
 import runtime.variable.Variable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Scope {
     private Scope parent;
-    private Map<String, Program> functions;
+    private Map<String, Function> functions;
     private Map<String, Variable> variables;
+
+    public Scope(Scope parent) {
+        this.parent = parent;
+        functions = new HashMap<>();
+        variables = new HashMap<>();
+    }
 
     public boolean addVariable(final String identifier, Variable value) {
         if (variables.containsKey(identifier)) {
@@ -27,20 +34,24 @@ public class Scope {
         return variables.get(identifier);
     }
 
-    public Program getFunction(final String identifier) {
+    public Function getFunction(final String identifier) {
         return functions.get(identifier);
     }
 
-    public Program getFunctionBody(Identifier identifier) {
-        Program body = functions.get(identifier.getName());
-
-        if (body == null)
-            throw new RuntimeException("Function " + identifier.getName() + " not defined.");
-        else
-            return body;
+    public void updateFunction(final String identifier, Function newFunction) {
+        functions.replace(identifier, newFunction);
     }
 
-    private boolean containsVariable(String identifier) {
+    public boolean addFunction(final String identifier, Function function) {
+        if (functions.containsKey(identifier))
+            return false;
+        else {
+            functions.put(identifier, function);
+            return true;
+        }
+    }
+
+    public boolean containsVariable(String identifier) {
         boolean contains = false;
 
         if (parent != null)
@@ -49,7 +60,7 @@ public class Scope {
         return contains || variables.containsKey(identifier);
     }
 
-    private boolean containsFunction(String identifier) {
+    public boolean containsFunction(String identifier) {
         boolean contains = false;
 
         if (parent != null)

@@ -17,7 +17,7 @@ public class DateVariable extends Variable implements Comparable {
     }
 
     @Override
-    Type getType() {
+    public Type getType() {
         return Type.DATE;
     }
 

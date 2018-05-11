@@ -9,9 +9,9 @@ import runtime.variable.VoidVariable;
 
 // foreach = "foreach" '('identifier ":" identifier')' instructionBlock
 public class Foreach extends Instruction {
-    Identifier iterator;
-    Identifier collection;
-    Program body;
+    private Identifier iterator;
+    private Identifier collection;
+    private Program body;
 
     public Foreach(Identifier iterator, Identifier collection, Program body) {
         this.iterator = iterator;
@@ -33,6 +33,7 @@ public class Foreach extends Instruction {
 
     @Override
     public Variable execute(Scope scope) {
-        return VoidVariable.getInstance(); // todo:
+        body.executeInstructions(scope);
+        return VoidVariable.getInstance();
     }
 }

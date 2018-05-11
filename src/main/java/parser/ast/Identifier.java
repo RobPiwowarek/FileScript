@@ -4,7 +4,7 @@ import parser.Scope;
 import runtime.variable.Variable;
 
 public class Identifier extends Node {
-    String name;
+    private String name;
 
     public Identifier(String name) {
         this.name = name;

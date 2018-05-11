@@ -1,6 +1,9 @@
 package parser;
 
 import parser.ast.instruction.Instruction;
+import parser.ast.instruction.call.Return;
+import runtime.variable.Variable;
+import runtime.variable.VoidVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +15,14 @@ public class Program {
         body.add(instruction);
     }
 
-    public void executeInstructions(Scope scope) {
+    public Variable executeInstructions(Scope scope) {
         for (Instruction instruction : body) {
-            instruction.execute(scope);
+            Variable result = instruction.execute(scope);
+
+            if (instruction instanceof Return)
+                return result;
         }
+
+        return VoidVariable.getInstance();
     }
 }

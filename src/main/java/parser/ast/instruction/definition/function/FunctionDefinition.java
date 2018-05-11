@@ -5,6 +5,7 @@ import parser.Scope;
 import parser.ast.Identifier;
 import parser.ast.Type;
 import parser.ast.instruction.definition.Definition;
+import runtime.function.Function;
 import runtime.variable.Variable;
 import runtime.variable.VoidVariable;
 
@@ -38,6 +39,9 @@ public class FunctionDefinition extends Definition {
 
     @Override
     public Variable execute(Scope scope) {
-        return VoidVariable.getInstance(); // todo: runtime'owa reprezentacja funkcji
+        Scope subScope = new Scope(scope);
+
+        scope.addFunction(identifier.getName(), new Function(body, subScope, arguments, returnType));
+        return VoidVariable.getInstance();
     }
 }

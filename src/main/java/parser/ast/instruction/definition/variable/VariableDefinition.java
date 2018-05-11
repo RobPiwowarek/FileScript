@@ -5,6 +5,6 @@ import parser.ast.instruction.definition.Definition;
 
 // variableDefinition = identifier ':' (arrayDefinition | fileDefinition | primitiveOrDateDefinition)
 public abstract class VariableDefinition extends Definition {
-    String name;
-    Node value;
+    protected String name;
+    protected Node value;
 }

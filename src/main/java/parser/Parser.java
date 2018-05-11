@@ -9,6 +9,7 @@ import parser.ast.Type;
 import parser.ast.instruction.Instruction;
 import parser.ast.instruction.assignment.Assignment;
 import parser.ast.instruction.call.FunctionCall;
+import parser.ast.instruction.call.FunctionCallArgument;
 import parser.ast.instruction.call.Return;
 import parser.ast.instruction.conditional.Else;
 import parser.ast.instruction.conditional.If;
@@ -96,7 +97,6 @@ public class Parser {
         accept(TokenType.DEF);
         Identifier identifier = new Identifier(current.getValue());
         accept(TokenType.IDENTIFIER);
-        accept(TokenType.OPEN_BRACE);
         List<FunctionArgument> arguments = parseFunctionArguments();
         accept(TokenType.COLON);
         Type returnType = parseType(current);
@@ -165,7 +165,7 @@ public class Parser {
     }
 
     private Instruction parseFunctionCall(Identifier identifier) throws Exception {
-        return new FunctionCall(parseFunctionArguments(), identifier);
+        return new FunctionCall(parseFunctionCallArguments(), identifier);
     }
 
     private Instruction parseVariableDefinition(Identifier identifier) throws Exception {
@@ -335,37 +335,54 @@ public class Parser {
     }
 
     private Node parseIdentifierOrFunctionCall() throws Exception {
-        if (current.getType() == TokenType.IDENTIFIER) {
-            Identifier identifier = new Identifier(current.getValue());
-            accept(TokenType.IDENTIFIER);
+        Identifier identifier = new Identifier(current.getValue());
+        accept(TokenType.IDENTIFIER);
 
-            if (current.getType() == TokenType.OPEN_BRACE) {
-                return new FunctionCall(parseFunctionArguments(), identifier);
-            } else {
-                return identifier;
-            }
+        if (current.getType() == TokenType.OPEN_BRACE) {
+            return new FunctionCall(parseFunctionCallArguments(), identifier);
         } else {
-            throw new RuntimeException(createErrorMessage(TokenType.IDENTIFIER));
+            return identifier;
         }
     }
 
     private List<FunctionArgument> parseFunctionArguments() throws Exception {
         ArrayList<FunctionArgument> arguments = new ArrayList<>();
 
-        if (current.getType() == TokenType.OPEN_BRACE) {
-            accept(TokenType.OPEN_BRACE);
+        accept(TokenType.OPEN_BRACE);
 
-            while (current.getType() == TokenType.IDENTIFIER) {
-                Identifier identifier = new Identifier(current.getValue());
-                accept(TokenType.IDENTIFIER);
-                FunctionArgument argument;
+        while (current.getType() == TokenType.IDENTIFIER) {
+            String identifier = current.getValue();
+            accept(TokenType.IDENTIFIER);
+            accept(TokenType.COLON);
 
-                accept(TokenType.COLON);
-                argument = new FunctionArgument(parseType(current), identifier);
+            arguments.add(new FunctionArgument(parseType(current), identifier));
 
-                accept(TokenType.COMMA);
-                arguments.add(argument);
-            }
+            if (current.getType() == TokenType.CLOSED_BRACE)
+                break;
+
+            accept(TokenType.COMMA);
+        }
+
+        accept(TokenType.CLOSED_BRACE);
+
+        return arguments;
+    }
+
+    private List<FunctionCallArgument> parseFunctionCallArguments() throws Exception {
+        ArrayList<FunctionCallArgument> arguments = new ArrayList<>();
+
+        accept(TokenType.OPEN_BRACE);
+
+        while (current.getType() == TokenType.IDENTIFIER) {
+            Identifier identifier = new Identifier(current.getValue());
+            accept(TokenType.IDENTIFIER);
+
+            arguments.add(new FunctionCallArgument(identifier));
+
+            if (current.getType() == TokenType.CLOSED_BRACE)
+                break;
+
+            accept(TokenType.COMMA);
         }
 
         accept(TokenType.CLOSED_BRACE);

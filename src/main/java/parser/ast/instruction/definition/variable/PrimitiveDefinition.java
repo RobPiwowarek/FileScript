@@ -16,7 +16,7 @@ public class PrimitiveDefinition extends VariableDefinition {
         super.value = value;
     }
 
-    @Override
+    @Override // todo: refactor
     public Variable execute(Scope scope) {
         switch (type) {
             case INT:

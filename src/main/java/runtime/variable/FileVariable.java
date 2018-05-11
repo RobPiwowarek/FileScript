@@ -79,7 +79,7 @@ public class FileVariable extends Variable implements Schedulable {
     }
 
     @Override
-    Type getType() {
+    public Type getType() {
         return Type.FILE;
     }
 }

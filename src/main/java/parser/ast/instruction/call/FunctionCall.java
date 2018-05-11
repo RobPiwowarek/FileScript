@@ -3,28 +3,37 @@ package parser.ast.instruction.call;
 import parser.Scope;
 import parser.ast.Identifier;
 import parser.ast.instruction.Instruction;
-import parser.ast.instruction.definition.function.FunctionArgument;
 import runtime.variable.Variable;
-import runtime.variable.VoidVariable;
 
 import java.util.List;
 
 // functionCall = identifier '(' arguments ')'
 public class FunctionCall extends Instruction {
-    List<FunctionArgument> arguments;
-    Identifier identifier;
+    private List<FunctionCallArgument> arguments;
+    private Identifier identifier;
 
-    public FunctionCall(List<FunctionArgument> arguments, Identifier identifier) {
+    public FunctionCall(List<FunctionCallArgument> arguments, Identifier identifier) {
         this.arguments = arguments;
         this.identifier = identifier;
     }
 
     @Override
     public Variable execute(Scope scope) {
-        return VoidVariable.getInstance(); // todo runtime'owa reprezentacja funkcji
+        if (scope.containsFunction(identifier.getName())) {
+
+            boolean argumentsExistInScope = arguments.stream()
+                    .map(arg -> scope.containsVariable(arg.getIdentifier()))
+                    .reduce(true, (a, b) -> a & b);
+
+            if (!argumentsExistInScope)
+                throw new RuntimeException("Error: could not find some of the arguments for function: " + identifier.getName());
+
+            return scope.getFunction(identifier.getName()).call(arguments);
+        } else
+            throw new RuntimeException("Error: could not find function: " + identifier.getName());
     }
 
-    public List<FunctionArgument> getArguments() {
+    public List<FunctionCallArgument> getArguments() {
         return arguments;
     }
 

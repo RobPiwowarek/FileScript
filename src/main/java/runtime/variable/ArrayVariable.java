@@ -28,7 +28,7 @@ public class ArrayVariable extends Variable {
     }
 
     @Override
-    Type getType() {
+    public Type getType() {
         return type;
     }
 }

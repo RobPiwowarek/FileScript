@@ -62,7 +62,7 @@ public class CatalogueVariable extends FileVariable implements Schedulable {
     }
 
     @Override
-    Type getType() {
+    public Type getType() {
         return Type.CATALOGUE;
     }
 }

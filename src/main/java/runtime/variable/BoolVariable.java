@@ -24,7 +24,7 @@ public class BoolVariable extends Variable implements Comparable {
     }
 
     @Override
-    Type getType() {
+    public Type getType() {
         return Type.BOOL;
     }
 

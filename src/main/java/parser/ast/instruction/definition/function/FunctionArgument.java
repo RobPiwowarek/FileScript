@@ -1,7 +1,6 @@
 package parser.ast.instruction.definition.function;
 
 import parser.Scope;
-import parser.ast.Identifier;
 import parser.ast.Node;
 import parser.ast.Type;
 import runtime.variable.Variable;
@@ -10,9 +9,9 @@ import runtime.variable.VoidVariable;
 // argumentsWithTypes = { identifier ':' type [ ',' identifier ':' type ] }
 public class FunctionArgument extends Node {
     private Type type;
-    private Identifier identifier;
+    private String identifier;
 
-    public FunctionArgument(Type type, Identifier identifier) {
+    public FunctionArgument(Type type, String identifier) {
         this.type = type;
         this.identifier = identifier;
     }
@@ -21,7 +20,7 @@ public class FunctionArgument extends Node {
         return type;
     }
 
-    public Identifier getIdentifier() {
+    public String getIdentifier() {
         return identifier;
     }
 

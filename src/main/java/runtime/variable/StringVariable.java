@@ -19,7 +19,7 @@ public class StringVariable extends Variable {
     }
 
     @Override
-    Type getType() {
+    public Type getType() {
         return Type.STRING;
     }
 }

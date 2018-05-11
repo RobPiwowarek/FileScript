@@ -13,7 +13,7 @@ public class VoidVariable extends Variable {
     }
 
     @Override
-    Type getType() {
+    public Type getType() {
         return Type.VOID;
     }
 }
