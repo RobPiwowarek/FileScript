@@ -7,6 +7,7 @@ import runtime.Schedulable;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -17,7 +18,7 @@ public class FileVariable extends Variable implements Schedulable {
     protected Scope scope;
     protected boolean isOpened = false;
 
-    public FileVariable(Scope scope) {
+    public  FileVariable(Scope scope) {
         this.scope = scope;
     }
 

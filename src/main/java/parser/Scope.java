@@ -51,6 +51,10 @@ public class Scope {
         }
     }
 
+    public boolean containsIdentifier(String identifier) {
+        return containsVariable(identifier) || containsFunction(identifier);
+    }
+
     public boolean containsVariable(String identifier) {
         boolean contains = false;
 
