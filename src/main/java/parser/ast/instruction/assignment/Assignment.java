@@ -9,8 +9,8 @@ import runtime.variable.VoidVariable;
 
 // assignment = identifier assignmentOperator assignableExpression
 public class Assignment extends Instruction {
-    Node expression;
-    Identifier identifier;
+    private Node expression;
+    private Identifier identifier;
 
     public Assignment(Node expression, Identifier identifier) {
         this.expression = expression;
@@ -27,6 +27,8 @@ public class Assignment extends Instruction {
 
     @Override
     public Variable execute(Scope scope) {
-        return VoidVariable.getInstance(); // todo:
+        Variable result = expression.execute(scope);
+        scope.addVariable(identifier.getName(), result);
+        return VoidVariable.getInstance();
     }
 }
