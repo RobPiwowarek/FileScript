@@ -10,22 +10,20 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class FileVariable extends Variable implements Schedulable {
     protected String name;
     protected Program updateBody;
+    protected Map<String, Variable> attributes;
     protected File file;
     protected Scope scope;
-    protected boolean isOpened = false;
 
-    public  FileVariable(Scope scope) {
+    public FileVariable(Scope scope) {
         this.scope = scope;
     }
 
     public boolean open() {
-        if (!isOpened)
-            isOpened = true;
-
         if (file == null || !file.exists())
             throw new RuntimeException("File named: " + name + " does not exist");
         else
@@ -34,17 +32,12 @@ public class FileVariable extends Variable implements Schedulable {
         return true;
     }
 
-    // todo: what if file == null
-    public boolean close() {
-        if (isOpened) {
-            isOpened = false;
-            return true;
-        } else
-            return false;
-    }
-
     public void setName(String name) {
         this.name = name;
+        if (attributes.containsKey("name"))
+            attributes.replace("name", new StringVariable(name));
+        else
+            attributes.put("name", new StringVariable(name));
     }
 
     public void create() {
@@ -82,5 +75,12 @@ public class FileVariable extends Variable implements Schedulable {
     @Override
     public Type getType() {
         return Type.FILE;
+    }
+
+    public Variable get(String attribute) {
+        if (attributes.containsKey(attribute))
+            return attributes.get(attribute);
+        else
+            throw new RuntimeException("Error: attribute " + attribute + " not found in file; " + name);
     }
 }
