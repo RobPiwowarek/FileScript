@@ -19,4 +19,8 @@ public abstract class Access extends Node{
     void setOwner(Variable owner) {
         this.evaluatedOwner = owner;
     }
+
+    public void setAccess(Access access) {
+        this.access = access;
+    }
 }

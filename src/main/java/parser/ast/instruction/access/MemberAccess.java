@@ -2,6 +2,7 @@ package parser.ast.instruction.access;
 
 import parser.Scope;
 import parser.ast.Identifier;
+import parser.ast.Node;
 import parser.ast.instruction.call.FunctionCall;
 import runtime.variable.FileVariable;
 import runtime.variable.Variable;
@@ -9,6 +10,11 @@ import runtime.variable.Variable;
 import java.lang.reflect.Method;
 
 public class MemberAccess extends Access {
+    public MemberAccess(Node from) {
+        this.from = from;
+        this.access = new EmptyAccess();
+    }
+
     @Override
     public Variable execute(Scope scope) {
         if (evaluatedOwner == null) {

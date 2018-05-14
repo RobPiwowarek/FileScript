@@ -7,6 +7,8 @@ import parser.ast.Identifier;
 import parser.ast.Node;
 import parser.ast.Type;
 import parser.ast.instruction.Instruction;
+import parser.ast.instruction.access.Access;
+import parser.ast.instruction.access.MemberAccess;
 import parser.ast.instruction.assignment.Assignment;
 import parser.ast.instruction.call.FunctionCall;
 import parser.ast.instruction.call.FunctionCallArgument;
@@ -204,7 +206,7 @@ public class Parser {
         if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
             return new ArrayDefinition(identifier.getName(), type, parseConstArray(), count);
         else
-            return new ArrayDefinition(identifier.getName(), type, parseIdentifierOrFunctionCall(), count);
+            return new ArrayDefinition(identifier.getName(), type, parseIdentifierOrFunctionCallOrAccess(), count);
     }
 
     private Instruction parseFileDefinition(Identifier identifier) throws Exception {
@@ -329,20 +331,48 @@ public class Parser {
 
     private Node parseOperand() throws Exception {
         if (current.getType() == TokenType.IDENTIFIER)
-            return parseIdentifierOrFunctionCall();
+            return parseIdentifierOrFunctionCallOrAccess();
         else
             return parseConstValue();
     }
 
-    private Node parseIdentifierOrFunctionCall() throws Exception {
+    private Node parseIdentifierOrFunctionCallOrAccess() throws Exception {
         Identifier identifier = new Identifier(current.getValue());
         accept(TokenType.IDENTIFIER);
 
-        if (current.getType() == TokenType.OPEN_BRACE) {
+        if (current.getType() == TokenType.PERIOD)
+            return parseMemberAccess(identifier);
+        else if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
+            return parseArrayAccess(identifier);
+        else if (current.getType() == TokenType.OPEN_BRACE) {
             return new FunctionCall(parseFunctionCallArguments(), identifier);
         } else {
             return identifier;
         }
+    }
+
+    // todo: cos rekurencyjnego? oddzielna metoda parsujaca tylko pojedynczo, referencje cur, next i sklejanie
+    private Node parseMemberAccess(Identifier identifier) throws Exception {
+        MemberAccess access = new MemberAccess(identifier);
+        Access subaccess;
+
+        do {
+            if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
+                subaccess = (Access) parseArrayAccess(identifier);
+            else {
+                accept(TokenType.PERIOD);
+
+            }
+
+
+        } while (current.getType() == TokenType.PERIOD || current.getType() == TokenType.OPEN_SQUARE_BRACE);
+
+
+
+    }
+
+    private Node parseArrayAccess(Identifier identifier) throws Exception {
+
     }
 
     private List<FunctionArgument> parseFunctionArguments() throws Exception {
