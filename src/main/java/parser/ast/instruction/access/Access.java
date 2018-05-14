@@ -14,6 +14,9 @@ import runtime.variable.Variable;
 public abstract class Access extends Node{
     protected Node from;
     protected Access access;
+    protected Variable evaluatedOwner;
 
-    abstract void setOwner(Variable owner);
+    void setOwner(Variable owner) {
+        this.evaluatedOwner = owner;
+    }
 }

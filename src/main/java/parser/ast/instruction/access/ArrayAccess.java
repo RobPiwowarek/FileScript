@@ -7,7 +7,6 @@ import runtime.variable.Variable;
 
 public class ArrayAccess extends Access {
     private int index;
-    private Variable evaluatedOwner;
 
     public ArrayAccess(int index, Node from, Access access) {
         this.index = index;
@@ -34,9 +33,4 @@ public class ArrayAccess extends Access {
             throw new RuntimeException("Error: cannot setOwner index of non-array variable");
     }
 
-
-    @Override
-    void setOwner(Variable owner) {
-        this.evaluatedOwner = owner;
-    }
 }
