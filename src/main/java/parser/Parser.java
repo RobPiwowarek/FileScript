@@ -8,6 +8,8 @@ import parser.ast.Node;
 import parser.ast.Type;
 import parser.ast.instruction.Instruction;
 import parser.ast.instruction.access.Access;
+import parser.ast.instruction.access.ArrayAccess;
+import parser.ast.instruction.access.EmptyAccess;
 import parser.ast.instruction.access.MemberAccess;
 import parser.ast.instruction.assignment.Assignment;
 import parser.ast.instruction.call.FunctionCall;
@@ -206,7 +208,7 @@ public class Parser {
         if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
             return new ArrayDefinition(identifier.getName(), type, parseConstArray(), count);
         else
-            return new ArrayDefinition(identifier.getName(), type, parseIdentifierOrFunctionCallOrAccess(), count);
+            return new ArrayDefinition(identifier.getName(), type, parseIdentifierOrFunctionCall(), count);
     }
 
     private Instruction parseFileDefinition(Identifier identifier) throws Exception {
@@ -331,48 +333,67 @@ public class Parser {
 
     private Node parseOperand() throws Exception {
         if (current.getType() == TokenType.IDENTIFIER)
-            return parseIdentifierOrFunctionCallOrAccess();
+            return parseIdentifierOrFunctionCall();
         else
             return parseConstValue();
     }
 
-    private Node parseIdentifierOrFunctionCallOrAccess() throws Exception {
+    private Node parseIdentifierOrFunctionCall() throws Exception {
         Identifier identifier = new Identifier(current.getValue());
         accept(TokenType.IDENTIFIER);
 
-        if (current.getType() == TokenType.PERIOD)
-            return parseMemberAccess(identifier);
-        else if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
-            return parseArrayAccess(identifier);
-        else if (current.getType() == TokenType.OPEN_BRACE) {
+        if (current.getType() == TokenType.OPEN_BRACE) {
             return new FunctionCall(parseFunctionCallArguments(), identifier);
         } else {
             return identifier;
         }
     }
 
-    // todo: cos rekurencyjnego? oddzielna metoda parsujaca tylko pojedynczo, referencje cur, next i sklejanie
-    private Node parseMemberAccess(Identifier identifier) throws Exception {
-        MemberAccess access = new MemberAccess(identifier);
-        Access subaccess;
+//    private Node parseAccess() throws Exception {
+//        Node from = parseIdentifierOrFunctionCall();
+//        Access access;
+//
+//        if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
+//            access = parseArrayAccess(from);
+//        else // todo: co jesli nie period
+//            access = parseMemberAccess(from);
+//
+//        while (current.getType() == TokenType.OPEN_SQUARE_BRACE || current.getType() == TokenType.PERIOD){
+//            Access temp;
+//
+//            if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
+//                temp = parseArrayAccess(from);
+//            else
+//                temp = parseMemberAccess(from);
+//
+//            access.setAccess(temp);
+//        }
+//
+//        if (access instanceof EmptyAccess)
+//            return from;
+//        else
+//            return access;
+//    }
+//
+//    private Access parseMemberAccess(Node from) throws Exception {
+//        if (current.getType() == TokenType.PERIOD){
+//            MemberAccess access = new MemberAccess(from);
+//            Node whatIsAccessed = parseIdentifierOrFunctionCall();
+//            access.setAccess();
+//
+//        } else
+//            return new EmptyAccess();
+//    }
 
-        do {
-            if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
-                subaccess = (Access) parseArrayAccess(identifier);
-            else {
-                accept(TokenType.PERIOD);
-
-            }
-
-
-        } while (current.getType() == TokenType.PERIOD || current.getType() == TokenType.OPEN_SQUARE_BRACE);
-
-
-
-    }
-
-    private Node parseArrayAccess(Identifier identifier) throws Exception {
-
+    private Access parseArrayAccess(Node from) throws Exception {
+        if (current.getType() == TokenType.OPEN_SQUARE_BRACE){
+            accept(TokenType.OPEN_SQUARE_BRACE);
+            Node index = parseIdentifierOrConstValue();
+            accept(TokenType.CLOSED_SQUARE_BRACE);
+            return new ArrayAccess(index, from);
+        }
+        else
+            return new EmptyAccess();
     }
 
     private List<FunctionArgument> parseFunctionArguments() throws Exception {

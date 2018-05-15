@@ -6,11 +6,10 @@ import runtime.variable.ArrayVariable;
 import runtime.variable.Variable;
 
 public class ArrayAccess extends Access {
-    private int index;
+    private Node index;
 
-    public ArrayAccess(int index, Node from, Access access) {
+    public ArrayAccess(Node index, Node from) {
         this.index = index;
-        super.access = access;
         super.from = from;
     }
 
