@@ -25,6 +25,7 @@ public class Function {
         this.arguments.forEach(arg -> scope.addVariable(arg.getIdentifier(), VoidVariable.getInstance()));
     }
 
+    // todo: przy wywolaniu funkcji scope ktory parenta ma tylko globala.
     public Variable call(List<FunctionCallArgument> callArguments) {
         if (callArguments.size() != arguments.size())
             throw new RuntimeException("Error: wrong number of arguments for function call");

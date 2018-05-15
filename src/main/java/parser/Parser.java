@@ -106,7 +106,6 @@ public class Parser {
         Type returnType = parseType(current);
         accept(TokenType.INT_TYPE, TokenType.BOOL_TYPE, TokenType.STRING_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
         accept(TokenType.ASSIGN_OP);
-        accept(TokenType.OPEN_CURLY_BRACE);
 
         Program body = parseInstructionBlock();
 
