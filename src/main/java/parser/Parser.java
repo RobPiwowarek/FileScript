@@ -7,10 +7,6 @@ import parser.ast.Identifier;
 import parser.ast.Node;
 import parser.ast.Type;
 import parser.ast.instruction.Instruction;
-import parser.ast.instruction.access.Access;
-import parser.ast.instruction.access.ArrayAccess;
-import parser.ast.instruction.access.EmptyAccess;
-import parser.ast.instruction.access.MemberAccess;
 import parser.ast.instruction.assignment.Assignment;
 import parser.ast.instruction.call.FunctionCall;
 import parser.ast.instruction.call.FunctionCallArgument;
@@ -272,6 +268,36 @@ public class Parser {
         return parseLogicalExpression();
     }
 
+    private Node parseAccess() throws Exception {
+        Node from = parseIdentifierOrFunctionCall();
+        accept(TokenType.IDENTIFIER);
+        accept(TokenType.PERIOD);
+
+        Node access = parseArrayAccess();
+
+        if (access == null)
+            access = parseMemberAccess();
+
+        return access;
+    }
+
+    private Node parseArrayAccess() throws Exception {
+        accept(TokenType.OPEN_SQUARE_BRACE);
+
+        Node index = parseIdentifierOrFunctionCall();
+        if (index == null)
+            index = parseConstValue();
+
+        Node access = new ArrayAccess(index, );
+
+
+        accept(TokenType.CLOSED_SQUARE_BRACE);
+    }
+
+    private Node parseMemberAccess() throws Exception {
+
+    }
+
     private Node parseLogicalExpression() throws Exception {
         Node node = parseRelationalExpression();
 
@@ -346,53 +372,6 @@ public class Parser {
         } else {
             return identifier;
         }
-    }
-
-//    private Node parseAccess() throws Exception {
-//        Node from = parseIdentifierOrFunctionCall();
-//        Access access;
-//
-//        if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
-//            access = parseArrayAccess(from);
-//        else // todo: co jesli nie period
-//            access = parseMemberAccess(from);
-//
-//        while (current.getType() == TokenType.OPEN_SQUARE_BRACE || current.getType() == TokenType.PERIOD){
-//            Access temp;
-//
-//            if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
-//                temp = parseArrayAccess(from);
-//            else
-//                temp = parseMemberAccess(from);
-//
-//            access.setAccess(temp);
-//        }
-//
-//        if (access instanceof EmptyAccess)
-//            return from;
-//        else
-//            return access;
-//    }
-//
-//    private Access parseMemberAccess(Node from) throws Exception {
-//        if (current.getType() == TokenType.PERIOD){
-//            MemberAccess access = new MemberAccess(from);
-//            Node whatIsAccessed = parseIdentifierOrFunctionCall();
-//            access.setAccess();
-//
-//        } else
-//            return new EmptyAccess();
-//    }
-
-    private Access parseArrayAccess(Node from) throws Exception {
-        if (current.getType() == TokenType.OPEN_SQUARE_BRACE){
-            accept(TokenType.OPEN_SQUARE_BRACE);
-            Node index = parseIdentifierOrConstValue();
-            accept(TokenType.CLOSED_SQUARE_BRACE);
-            return new ArrayAccess(index, from);
-        }
-        else
-            return new EmptyAccess();
     }
 
     private List<FunctionArgument> parseFunctionArguments() throws Exception {

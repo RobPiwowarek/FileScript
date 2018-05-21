@@ -4,60 +4,49 @@ import parser.Scope;
 import parser.ast.Type;
 import runtime.Schedulable;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CatalogueVariable extends FileVariable implements Schedulable {
-    private List<CatalogueVariable> subdirectories;
-    private List<FileVariable> files;
+    private ArrayVariable subdirectories;
+    private ArrayVariable files;
 
     public CatalogueVariable(Scope scope) {
         super(scope);
-        subdirectories = new ArrayList<>();
-        files = new ArrayList<>();
+        subdirectories = new ArrayVariable(Type.CATALOGUE);
+        files = new ArrayVariable(Type.FILE);
     }
 
-    public List<CatalogueVariable> getSubdirectories() {
+    public ArrayVariable getSubdirectories() {
         return subdirectories;
     }
 
-    public void setSubdirectories(List<CatalogueVariable> subdirectories) {
-        this.subdirectories = subdirectories;
+    public void addSubdirectory(Variable variable) {
+        subdirectories.add(variable);
     }
 
-    public void addSubdirectories(List<Variable> variables) {
-        for (Variable subdir : variables) {
-            subdirectories.add((CatalogueVariable) subdir);
-        }
+    public void addFile(Variable variable) {
+        files.add(variable);
     }
 
-    public void addFiles(List<Variable> variables) {
-        for (Variable file : variables) {
-            files.add((FileVariable) file);
-        }
-    }
-
-    public List<FileVariable> getFiles() {
+    public ArrayVariable getFiles() {
         return files;
-    }
-
-    public void setFiles(List<FileVariable> files) {
-        this.files = files;
     }
 
     @Override
     public void create() {
-        if (!isOpened)
-            return;
+        if (!super.file.mkdir())
+            throw new RuntimeException("Error. Catalogue " + this.name + " could not be created");
 
-        super.file.mkdir();
-
-        for (FileVariable file : files) {
-            file.create();
+        for (Variable file : files.getArray()) {
+            if (file instanceof FileVariable)
+                ((FileVariable) file).create();
         }
 
-        for (CatalogueVariable subdir : subdirectories) {
-            subdir.create();
+        for (Variable subdir : subdirectories.getArray()) {
+            if (subdir instanceof CatalogueVariable)
+                ((CatalogueVariable) subdir).create();
         }
     }
 

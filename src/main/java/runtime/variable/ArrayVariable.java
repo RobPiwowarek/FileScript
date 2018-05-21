@@ -43,5 +43,10 @@ public class ArrayVariable extends Variable {
             throw new RuntimeException("Error: Cannot add variable of type " + element.getType() + " to array of type: " + type);
     }
 
-
+    public void add(Variable element) {
+        if (element.getType() == type)
+            array.add(element);
+        else
+            throw new RuntimeException("Error: Cannot add variable of type " + element.getType() + " to array of type: " + type);
+    }
 }

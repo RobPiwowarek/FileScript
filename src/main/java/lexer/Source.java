@@ -27,7 +27,7 @@ class Source {
             }
 
         } catch (IOException e) {
-            System.out.println("Could not read from source");
+            System.out.println("Could not read left source");
             throw new RuntimeException(e);
         }
     }

@@ -1,26 +1,39 @@
 package parser.ast.instruction.access;
 
+import parser.Scope;
+import parser.ast.Identifier;
 import parser.ast.Node;
+import parser.ast.instruction.call.FunctionCall;
+import runtime.variable.CatalogueVariable;
+import runtime.variable.FileVariable;
 import runtime.variable.Variable;
 
+public class Access extends Node {
+    private Node left;
+    private Node right;
 
-/*
- *   Jaki jest zamysl i o co chodzi
- *   Generalnie problem z accessem jest taki, ze moge miec wiele kombinacji rzeczy ktore juz mam tzn. identifier.identifier.functioncall.identifier[0].functioncall
- *   Rozwiazanie jest proste, potrzeba w jakis sposob dostarczyc informacje do istniejacych node'ow o tym czy owner zostal juz wyliczony,
- *   tzn. w tym przykladzie identifier nr. 2 powinien dostac obiekt zmiennej identifier nr. 1 ktory jest juz wyliczony, zeby nie wyliczac go znowu.
- *   Te struktury sa proba implementacji rozwiazania tego problemu.
- */
-public abstract class Access extends Node{
-    protected Node from;
-    protected Access access;
-    protected Variable evaluatedOwner;
+    @Override
+    public Variable execute(Scope scope) {
+        FileVariable from = (FileVariable) left.execute(scope); // a moze byc zwrocony array variable i robimy tu access ewentualnie inna klasa na to
 
-    void setOwner(Variable owner) {
-        this.evaluatedOwner = owner;
-    }
+        if (right instanceof Identifier) {
+            String memberName = ((Identifier) right).getName();
 
-    public void setAccess(Access access) {
-        this.access = access;
+            switch (memberName) {
+                case "subdirectories":
+                    return ((CatalogueVariable) from).getSubdirectories();
+                case "files":
+                    return ((CatalogueVariable) from).getFiles();
+                case "name":
+                    return from.get("name");
+                default:
+                    throw new RuntimeException("Error. Attribute not yet supported or undefined");
+            }
+        } else if (right instanceof FunctionCall) {
+            // copy from, copy to
+        } else
+            throw new RuntimeException("Error. Expected Identifier, FunctionCall or Access as right side of Access operator");
+
+        return null;
     }
 }
