@@ -12,12 +12,17 @@ public class Access extends Node {
     private Node left;
     private Node right;
 
+    public Access(Node left, Node right) {
+        this.left = left;
+        this.right = right;
+    }
+
     @Override
     public Variable execute(Scope scope) {
         FileVariable from = (FileVariable) left.execute(scope); // a moze byc zwrocony array variable i robimy tu access ewentualnie inna klasa na to
 
-        if (right instanceof Identifier) {
-            String memberName = ((Identifier) right).getName();
+        if (left instanceof Identifier) {
+            String memberName = ((Identifier) left).getName();
 
             switch (memberName) {
                 case "subdirectories":
@@ -29,8 +34,19 @@ public class Access extends Node {
                 default:
                     throw new RuntimeException("Error. Attribute not yet supported or undefined");
             }
-        } else if (right instanceof FunctionCall) {
-            // copy from, copy to
+        } else if (left instanceof FunctionCall) {
+            switch (((FunctionCall) left).getIdentifier().getName()) {
+                case "copyTo":
+                    break;
+                case "moveTo":
+                    break;
+                case "delete":
+                    break;
+                default:
+                    throw new RuntimeException("Error. Method undefined");
+            }
+        } else if (left instanceof Access) {
+
         } else
             throw new RuntimeException("Error. Expected Identifier, FunctionCall or Access as right side of Access operator");
 

@@ -39,6 +39,9 @@ public class FunctionDefinition extends Definition {
 
     @Override
     public Variable execute(Scope scope) {
+        if (scope.containsFunction(identifier.getName()))
+            throw new RuntimeException("Error. Function " + identifier.getName() + " already defined.");
+
         Scope subScope = new Scope(scope);
 
         scope.addFunction(identifier.getName(), new Function(body, subScope, arguments, returnType));

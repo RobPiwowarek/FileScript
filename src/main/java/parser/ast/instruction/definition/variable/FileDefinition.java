@@ -43,10 +43,12 @@ public class FileDefinition extends VariableDefinition {
                             catalogue.setName((attribute.getValue().execute(scope)).toString());
                             break;
                         case "subdirectories":
-                            catalogue.addSubdirectories(((ArrayVariable) attribute.getValue().execute(scope)).getArray());
+                            for (Variable cata:((ArrayVariable) attribute.getValue().execute(scope)).getArray())
+                                catalogue.addSubdirectory(cata);
                             break;
                         case "files":
-                            catalogue.addSubdirectories(((ArrayVariable) attribute.getValue().execute(scope)).getArray());
+                            for (Variable filee:((ArrayVariable) attribute.getValue().execute(scope)).getArray())
+                                catalogue.addFile(filee);
                             break;
                         default:
                             throw new RuntimeException("Error: Undefined attribute " + attribute.getName());

@@ -7,6 +7,8 @@ import parser.ast.Identifier;
 import parser.ast.Node;
 import parser.ast.Type;
 import parser.ast.instruction.Instruction;
+import parser.ast.instruction.access.Access;
+import parser.ast.instruction.access.ArrayAccess;
 import parser.ast.instruction.assignment.Assignment;
 import parser.ast.instruction.call.FunctionCall;
 import parser.ast.instruction.call.FunctionCallArgument;
@@ -203,7 +205,7 @@ public class Parser {
         if (current.getType() == TokenType.OPEN_SQUARE_BRACE)
             return new ArrayDefinition(identifier.getName(), type, parseConstArray(), count);
         else
-            return new ArrayDefinition(identifier.getName(), type, parseIdentifierOrFunctionCall(), count);
+            return new ArrayDefinition(identifier.getName(), type, parseIdentifierOrFunctionCallOrAccess(), count);
     }
 
     private Instruction parseFileDefinition(Identifier identifier) throws Exception {
@@ -268,34 +270,29 @@ public class Parser {
         return parseLogicalExpression();
     }
 
-    private Node parseAccess() throws Exception {
-        Node from = parseIdentifierOrFunctionCall();
-        accept(TokenType.IDENTIFIER);
+    private Node parseAccess(Node from) throws Exception {
         accept(TokenType.PERIOD);
+        Node identifier = parseIdentifierOrFunctionCallOrAccess();
 
-        Node access = parseArrayAccess();
+        Node fromAccess = new Access(from, identifier);
 
-        if (access == null)
-            access = parseMemberAccess();
-
-        return access;
+        if (current.getType() == TokenType.PERIOD)
+            return parseAccess(fromAccess);
+        else
+            return fromAccess;
     }
 
-    private Node parseArrayAccess() throws Exception {
+    private Node parseArrayAccess(Node from) throws Exception {
         accept(TokenType.OPEN_SQUARE_BRACE);
 
-        Node index = parseIdentifierOrFunctionCall();
+        Node index = parseIdentifierOrFunctionCallOrAccess();
         if (index == null)
             index = parseConstValue();
 
-        Node access = new ArrayAccess(index, );
-
+        Node access = new ArrayAccess(from, index);
 
         accept(TokenType.CLOSED_SQUARE_BRACE);
-    }
-
-    private Node parseMemberAccess() throws Exception {
-
+        return access;
     }
 
     private Node parseLogicalExpression() throws Exception {
@@ -347,6 +344,16 @@ public class Parser {
     }
 
     private Node parseHighPriorityArithmeticExpression() throws Exception {
+        Node node = parseOperandOrExpression();
+
+        while (isAcceptable(TokenType.MULTIPLY, TokenType.DIVIDE)) {
+            node = new Expression(node, current.getType(), parseOperandOrExpression());
+            accept(TokenType.MULTIPLY, TokenType.DIVIDE);
+        }
+        return node;
+    }
+
+    private Node parseOperandOrExpression() throws Exception {
         if (current.getType() == TokenType.OPEN_BRACE) {
             accept(TokenType.OPEN_BRACE);
             Node node = parseExpression();
@@ -358,20 +365,23 @@ public class Parser {
 
     private Node parseOperand() throws Exception {
         if (current.getType() == TokenType.IDENTIFIER)
-            return parseIdentifierOrFunctionCall();
+            return parseIdentifierOrFunctionCallOrAccess();
         else
             return parseConstValue();
     }
 
-    private Node parseIdentifierOrFunctionCall() throws Exception {
+    private Node parseIdentifierOrFunctionCallOrAccess() throws Exception {
         Identifier identifier = new Identifier(current.getValue());
+        Node node = identifier;
         accept(TokenType.IDENTIFIER);
 
-        if (current.getType() == TokenType.OPEN_BRACE) {
-            return new FunctionCall(parseFunctionCallArguments(), identifier);
-        } else {
-            return identifier;
-        }
+        if (current.getType() == TokenType.OPEN_BRACE)
+            node = new FunctionCall(parseFunctionCallArguments(), identifier);
+
+        if (current.getType() == TokenType.PERIOD)
+            return parseAccess(node);
+        else
+            return node;
     }
 
     private List<FunctionArgument> parseFunctionArguments() throws Exception {

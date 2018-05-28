@@ -16,9 +16,9 @@ import runtime.variable.Variable;
 // T3 = operand {highPriorityArithmeticOperator operand}
 // operand = identifier | constValue | functionCall | '(' expression ')'
 public class Expression extends Node {
-    Node left;
-    TokenType operator;
-    Node right;
+    private Node left;
+    private TokenType operator;
+    private Node right;
 
     public Expression(Node left, TokenType operator, Node right) {
         if (left == null)
