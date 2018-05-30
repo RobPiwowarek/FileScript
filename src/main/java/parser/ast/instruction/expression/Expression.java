@@ -70,7 +70,7 @@ public class Expression extends Node {
             case MULTIPLY:
                 return CommonOperations.multiply(leftResult, rightResult);
             case DIVIDE:
-                return CommonOperations.add(leftResult, rightResult);
+                return CommonOperations.divide(leftResult, rightResult);
             default:
                 throw new RuntimeException("Unexpected operator in expression " + operator);
         }

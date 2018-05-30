@@ -28,18 +28,20 @@ public class FunctionCall extends Instruction {
         } else {
             argumentsExistInScope(scope);
 
-            Class[] argumentClasses = new Class[1];
+            Class[] argumentClasses;
 
-            arguments
-                    .stream()
-                    .map(x -> x.execute(scope))
-                    .map(x -> x.getClass())
-                    .collect(Collectors.toList())
-                    .toArray(argumentClasses);
+            List<Variable> evaluatedArguments = arguments.stream().map(x -> x.execute(scope)).collect(Collectors.toList());
+
+            argumentClasses =
+                    evaluatedArguments
+                            .stream()
+                            .map(Variable::getClass)
+                            .map(Class::getSuperclass)
+                            .toArray(Class[]::new);
 
             try {
                 Method method = CommonOperations.class.getMethod(identifier.getName(), argumentClasses);
-                return (Variable) method.invoke(null, (Object[]) argumentClasses);
+                return (Variable) method.invoke(null, evaluatedArguments.toArray());
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException("Error: could not find function: " + identifier.getName());
             } catch (Exception e) {

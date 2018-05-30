@@ -52,10 +52,13 @@ public abstract class CommonOperations {
     }
 
     public static IntegerVariable divide(IntegerVariable a, IntegerVariable b) {
+        if (b.getValue() == 0)
+            throw new ArithmeticException("Error. Division by 0");
+
         return new IntegerVariable(a.getValue() / b.getValue());
     }
 
-    public static void println(IntegerVariable variable) {
+    public static void println(Variable variable) {
         System.out.println(variable.toString());
     }
 }
