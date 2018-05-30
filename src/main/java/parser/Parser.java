@@ -42,9 +42,12 @@ public class Parser {
 
         Instruction lastParsedInstruction;
 
-        while ((lastParsedInstruction = parseInstruction()) != null) {
-            program.addInstruction(lastParsedInstruction);
-        }
+//        while ((lastParsedInstruction = parseInstruction()) != null && current.getType() != TokenType.EOF) {
+//            program.addInstruction(lastParsedInstruction);
+//        }
+
+      program.addInstruction(parseInstruction());
+      program.addInstruction(parseInstruction());
 
         return program;
     }
@@ -407,6 +410,7 @@ public class Parser {
         return arguments;
     }
 
+    // todo: niech funcion argument przyjmuje tez consty, functionCalle?
     private List<FunctionCallArgument> parseFunctionCallArguments() throws Exception {
         ArrayList<FunctionCallArgument> arguments = new ArrayList<>();
 
@@ -444,8 +448,10 @@ public class Parser {
                     builder.append(current.getValue());
                     // todo: parse time
                     return new ConstDate();
-                } else
+                } else{
+                    accept(TokenType.CONST_INT);
                     return new ConstInt(Integer.parseInt(value));
+                }
             case CONST_BOOL:
                 ConstBool bool = new ConstBool((current.getValue().equals("true"))); // todo: error detection
                 accept(TokenType.CONST_BOOL);

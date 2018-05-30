@@ -1,5 +1,7 @@
 package lexer;
 
+import lexer.exception.EmptySourceException;
+
 import java.io.*;
 
 class Source {
@@ -36,8 +38,11 @@ class Source {
         return currentChar;
     }
 
-    char nextChar() {
+    char nextChar() throws EmptySourceException {
         char tempChar = currentChar;
+
+        if (currentChar == (char) -1)
+            throw new EmptySourceException();
 
         getNextChar();
 
@@ -62,7 +67,7 @@ class Source {
     }
 
     boolean isEoF() {
-        return (int) currentChar == -1;
+        return (currentChar == (char) -1);
     }
 
     public int getCharCounter() {

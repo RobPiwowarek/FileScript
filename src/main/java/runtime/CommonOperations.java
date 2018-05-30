@@ -2,6 +2,7 @@ package runtime;
 
 import runtime.variable.BoolVariable;
 import runtime.variable.IntegerVariable;
+import runtime.variable.Variable;
 
 public abstract class CommonOperations {
     public static BoolVariable less(Comparable a, Comparable b) {
@@ -52,5 +53,9 @@ public abstract class CommonOperations {
 
     public static IntegerVariable divide(IntegerVariable a, IntegerVariable b) {
         return new IntegerVariable(a.getValue() / b.getValue());
+    }
+
+    public static void println(IntegerVariable variable) {
+        System.out.println(variable.toString());
     }
 }

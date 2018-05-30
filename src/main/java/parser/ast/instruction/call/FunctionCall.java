@@ -28,7 +28,7 @@ public class FunctionCall extends Instruction {
         } else {
             argumentsExistInScope(scope);
 
-            Class[] argumentClasses = new Class[2];
+            Class[] argumentClasses = new Class[1];
 
             arguments
                     .stream()

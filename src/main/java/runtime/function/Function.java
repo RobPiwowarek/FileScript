@@ -18,7 +18,7 @@ public class Function {
 
     public Function(Program body, Scope scope, List<FunctionArgument> arguments, Type returnType) {
         this.body = body;
-        this.scope = scope;
+        this.scope = scope.copy();
         this.arguments = arguments;
         this.returnType = returnType;
 

@@ -17,6 +17,13 @@ public class Scope {
         variables = new HashMap<>();
     }
 
+    public Scope copy() {
+        Scope copy = new Scope(parent);
+        copy.functions = new HashMap<>(functions);
+        copy.variables = new HashMap<>(variables);
+        return copy;
+    }
+
     public boolean addVariable(final String identifier, Variable value) {
         if (variables.containsKey(identifier)) {
             return false;

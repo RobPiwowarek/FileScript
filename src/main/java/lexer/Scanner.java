@@ -27,36 +27,39 @@ public class Scanner {
     }
 
     private void getNextToken() {
-        if (source.isEoF())
-            throw new EmptySourceException();
+        try {
+            char currentChar = source.nextChar();
 
-        char currentChar = source.nextChar();
+            if (Character.isWhitespace(currentChar))
+                do {
+                    currentChar = source.nextChar();
+                } while (Character.isWhitespace(currentChar));
 
-        if (Character.isWhitespace(currentChar))
-            do {
-                currentChar = source.nextChar();
-            } while (Character.isWhitespace(currentChar) && !source.isEoF());
-
-        if (source.isEoF())
+            if (Character.isDigit(currentChar) && currentChar != '0') // todo: a co z zerem jako liczba
+                currentToken = processNumber(currentChar);
+            else if (Character.isLetter(currentChar))
+                currentToken = processKeywordOrIdentifier(currentChar);
+            else if (currentChar == '&' || currentChar == '|')
+                currentToken = processLogicalOperator(currentChar);
+            else if (currentChar == '=' || currentChar == '!' || currentChar == '<' || currentChar == '>')
+                currentToken = processRelationalOrAssignmentOperator(currentChar);
+            else if (currentChar == '\"')
+                currentToken = processString(currentChar);
+            else
+                currentToken = processSingleCharacterToken(currentChar);
+        }
+        catch (EmptySourceException e) {
             currentToken = EndOfFileToken();
-        else if (Character.isDigit(currentChar) && currentChar != '0')
-            currentToken = processNumber(currentChar);
-        else if (Character.isLetter(currentChar))
-            currentToken = processKeywordOrIdentifier(currentChar);
-        else if (currentChar == '&' || currentChar == '|')
-            currentToken = processLogicalOperator(currentChar);
-        else if (currentChar == '=' || currentChar == '!' || currentChar == '<' || currentChar == '>')
-            currentToken = processRelationalOrAssignmentOperator(currentChar);
-        else if (currentChar == '\"')
-            currentToken = processString(currentChar);
-        else
-            currentToken = processSingleCharacterToken(currentChar);
+        }
     }
 
     public Token nextToken() {
         Token tempToken = currentToken;
 
-        getNextToken();
+        if (currentToken.getType() == TokenType.EOF)
+            return tempToken;
+        else
+            getNextToken();
 
         return tempToken;
     }
@@ -81,7 +84,7 @@ public class Scanner {
         return new Token(TokenType.EOF, "No more tokens");
     }
 
-    private Token processString(char currentChar) {
+    private Token processString(char currentChar) throws EmptySourceException{
         StringBuilder token = new StringBuilder();
 
         token.append(currentChar);
@@ -99,7 +102,7 @@ public class Scanner {
         return new Token(TokenType.CONST_STRING, token.toString());
     }
 
-    private Token processNumber(char currentChar) {
+    private Token processNumber(char currentChar) throws EmptySourceException {
         StringBuilder token = new StringBuilder();
 
         token.append(currentChar);
@@ -111,7 +114,7 @@ public class Scanner {
         return new Token(TokenType.CONST_INT, token.toString());
     }
 
-    private Token processKeywordOrIdentifier(char currentChar) {
+    private Token processKeywordOrIdentifier(char currentChar) throws EmptySourceException {
         StringBuilder token = new StringBuilder();
 
         token.append(currentChar);
@@ -127,7 +130,7 @@ public class Scanner {
         }
     }
 
-    private Token processLogicalOperator(char currentChar) {
+    private Token processLogicalOperator(char currentChar) throws EmptySourceException {
         StringBuilder token = new StringBuilder();
 
         token.append(currentChar);
@@ -140,7 +143,7 @@ public class Scanner {
         return KeywordsTable.get(token.toString());
     }
 
-    private Token processRelationalOrAssignmentOperator(char currentChar) {
+    private Token processRelationalOrAssignmentOperator(char currentChar) throws EmptySourceException {
         StringBuilder token = new StringBuilder();
 
         token.append(currentChar);
@@ -155,7 +158,7 @@ public class Scanner {
         return KeywordsTable.get(token.toString());
     }
 
-    private Token processSingleCharacterToken(char currentChar) {
+    private Token processSingleCharacterToken(char currentChar) throws EmptySourceException {
         Token token = KeywordsTable.get(Character.toString(currentChar));
 
         if (token == null)
