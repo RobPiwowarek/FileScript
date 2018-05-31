@@ -176,7 +176,7 @@ public class ScannerTest {
         Token token = scanner.nextToken();
 
         assertEquals(token.getType(), TokenType.CONST_STRING);
-        assertEquals(token.getValue(), value);
+        assertEquals(token.getValue(), value.replaceAll("\"", ""));
     }
 
     @Test
@@ -187,7 +187,7 @@ public class ScannerTest {
         Token token = scanner.nextToken();
 
         assertEquals(token.getType(), TokenType.CONST_STRING);
-        assertEquals(token.getValue(), value);
+        assertEquals(token.getValue(), "\\\"12345\\\"");
     }
 
     @Test
