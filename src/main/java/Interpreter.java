@@ -13,7 +13,6 @@ public class Interpreter {
     public Interpreter() {
         Scanner lexer = new Scanner(new File(System.getProperty("resources") + "test.file"));
         parser = new Parser(lexer);
-        execute();
     }
 
     public void execute() {

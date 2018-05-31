@@ -11,7 +11,6 @@ import parser.ast.instruction.access.Access;
 import parser.ast.instruction.access.ArrayAccess;
 import parser.ast.instruction.assignment.Assignment;
 import parser.ast.instruction.call.FunctionCall;
-import parser.ast.instruction.call.FunctionCallArgument;
 import parser.ast.instruction.call.Return;
 import parser.ast.instruction.conditional.Else;
 import parser.ast.instruction.conditional.If;
@@ -23,7 +22,10 @@ import parser.ast.instruction.definition.variable.FileDefinition;
 import parser.ast.instruction.definition.variable.PrimitiveDefinition;
 import parser.ast.instruction.expression.Expression;
 import parser.ast.instruction.loop.Foreach;
-import parser.ast.instruction.value.*;
+import parser.ast.instruction.value.ConstArray;
+import parser.ast.instruction.value.ConstBool;
+import parser.ast.instruction.value.ConstInt;
+import parser.ast.instruction.value.ConstString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -403,37 +405,43 @@ public class Parser {
 
             arguments.add(new FunctionArgument(parseType(current), identifier));
 
-            if (current.getType() == TokenType.CLOSED_BRACE)
-                break;
-
-            accept(TokenType.COMMA);
+            if (current.getType() == TokenType.COMMA)
+                accept(TokenType.COMMA);
+            else if (current.getType() == TokenType.CLOSED_BRACE) {
+                accept(TokenType.CLOSED_BRACE);
+                return arguments;
+            } else
+                accept(TokenType.COMMA, TokenType.CLOSED_BRACE);
         }
-
-        accept(TokenType.CLOSED_BRACE);
-
         return arguments;
     }
 
-    // todo: niech funcion argument przyjmuje tez consty, functionCalle?
-    private List<FunctionCallArgument> parseFunctionCallArguments() throws Exception {
-        ArrayList<FunctionCallArgument> arguments = new ArrayList<>();
+    private List<Node> parseFunctionCallArguments() throws Exception {
+        ArrayList<Node> arguments = new ArrayList<>();
 
         accept(TokenType.OPEN_BRACE);
 
-        while (current.getType() == TokenType.IDENTIFIER) {
-            Identifier identifier = new Identifier(current.getValue());
-            accept(TokenType.IDENTIFIER);
+        while (current.getType() != TokenType.EOF) {
+            Node arg;
 
-            arguments.add(new FunctionCallArgument(identifier));
+            if (current.getType() == TokenType.IDENTIFIER)
+                arg = parseIdentifierOrFunctionCallOrAccess();
+            else if (current.getType() == TokenType.CLOSED_BRACE) {
+                accept(TokenType.CLOSED_BRACE);
+                return arguments;
+            } else
+                arg = parseConstValue();
 
-            if (current.getType() == TokenType.CLOSED_BRACE)
-                break;
+            arguments.add(arg);
 
-            accept(TokenType.COMMA);
+            if (current.getType() == TokenType.COMMA)
+                accept(TokenType.COMMA);
+            else if (current.getType() == TokenType.CLOSED_BRACE) {
+                accept(TokenType.CLOSED_BRACE);
+                return arguments;
+            } else
+                accept(TokenType.COMMA, TokenType.CLOSED_BRACE);
         }
-
-        accept(TokenType.CLOSED_BRACE);
-
         return arguments;
     }
 
@@ -441,23 +449,11 @@ public class Parser {
         switch (current.getType()) {
             case CONST_INT:
                 String value = current.getValue();
-
-                if (current.getType() == TokenType.DIVIDE) {
-                    StringBuilder builder = new StringBuilder(value);
-                    builder.append('/');
-                    accept(TokenType.DIVIDE);
-                    builder.append(current.getValue());
-                    builder.append('/');
-                    accept(TokenType.DIVIDE);
-                    builder.append(current.getValue());
-                    // todo: parse time
-                    return new ConstDate();
-                } else {
-                    accept(TokenType.CONST_INT);
-                    return new ConstInt(Integer.parseInt(value));
-                }
+                // todo: date
+                accept(TokenType.CONST_INT);
+                return new ConstInt(Integer.parseInt(value));
             case CONST_BOOL:
-                ConstBool bool = new ConstBool((current.getValue().equals("true"))); // todo: error detection
+                ConstBool bool = new ConstBool((current.getValue().equals("true")));
                 accept(TokenType.CONST_BOOL);
                 return bool;
             case CONST_STRING:

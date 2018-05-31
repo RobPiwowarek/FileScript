@@ -2,8 +2,10 @@ package runtime.function;
 
 import parser.Program;
 import parser.Scope;
+import parser.ast.Identifier;
+import parser.ast.Node;
 import parser.ast.Type;
-import parser.ast.instruction.call.FunctionCallArgument;
+import parser.ast.instruction.call.FunctionCall;
 import parser.ast.instruction.definition.function.FunctionArgument;
 import runtime.variable.Variable;
 import runtime.variable.VoidVariable;
@@ -25,21 +27,40 @@ public class Function {
         this.arguments.forEach(arg -> scope.addVariable(arg.getIdentifier(), VoidVariable.getInstance()));
     }
 
-    // todo: przy wywolaniu funkcji scope ktory parenta ma tylko globala.
-    public Variable call(List<FunctionCallArgument> callArguments) {
+    private void argumentsExistInScope(List<Node> callArguments) {
+        boolean argumentsExistInScope = callArguments
+                .stream()
+                .filter(arg -> arg instanceof Identifier)
+                .map(arg -> scope.containsVariable(((Identifier) arg).getName()))
+                .reduce(true, (a, b) -> a && b);
+
+        boolean functionsExistInScope = callArguments
+                .stream()
+                .filter(arg -> arg instanceof FunctionCall)
+                .map(arg -> ((FunctionCall) arg).getIdentifier().getName())
+                .map(name -> scope.containsFunction(name))
+                .reduce(true, (a, b) -> a && b);
+
+        argumentsExistInScope = argumentsExistInScope && functionsExistInScope;
+
+        if (!argumentsExistInScope)
+            throw new RuntimeException("Error: could not find some of the arguments for function");
+    }
+
+    public Variable call(List<Node> callArguments) {
         if (callArguments.size() != arguments.size())
             throw new RuntimeException("Error: wrong number of arguments for function call");
 
         for (int i = 0; i < arguments.size(); ++i) {
-            Type type = arguments.get(i).getType();
-            FunctionCallArgument argument = callArguments.get(i);
-            Variable callArgument = argument.execute(scope);
+            FunctionArgument arg = arguments.get(i);
+            Type type = arg.getType();
+            argumentsExistInScope(callArguments);
+            Variable evaluatedArgument = callArguments.get(i).execute(scope);
 
-            if (type == callArgument.getType()){
-                scope.updateVariable(argument.getIdentifier(), callArgument);
-            }
+            if (type == evaluatedArgument.getType())
+                scope.updateVariable(arg.getIdentifier(), evaluatedArgument);
             else
-                throw new RuntimeException("Error: argument type mismatch. Expected: " + type + " found: " + callArgument.getType());
+                throw new RuntimeException("Error: argument type mismatch. Expected: " + type + " found: " + evaluatedArgument.getType());
         }
 
         Variable result = body.executeInstructions(scope);

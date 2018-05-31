@@ -2,6 +2,7 @@ package parser.ast.instruction.call;
 
 import parser.Scope;
 import parser.ast.Identifier;
+import parser.ast.Node;
 import parser.ast.instruction.Instruction;
 import runtime.CommonOperations;
 import runtime.variable.Variable;
@@ -12,10 +13,10 @@ import java.util.stream.Collectors;
 
 // functionCall = identifier '(' arguments ')'
 public class FunctionCall extends Instruction {
-    private List<FunctionCallArgument> arguments;
+    private List<Node> arguments;
     private Identifier identifier;
 
-    public FunctionCall(List<FunctionCallArgument> arguments, Identifier identifier) {
+    public FunctionCall(List<Node> arguments, Identifier identifier) {
         this.arguments = arguments;
         this.identifier = identifier;
     }
@@ -23,11 +24,8 @@ public class FunctionCall extends Instruction {
     @Override
     public Variable execute(Scope scope) {
         if (scope.containsFunction(identifier.getName())) {
-            argumentsExistInScope(scope);
             return scope.getFunction(identifier.getName()).call(arguments);
         } else {
-            argumentsExistInScope(scope);
-
             Class[] argumentClasses;
 
             List<Variable> evaluatedArguments = arguments.stream().map(x -> x.execute(scope)).collect(Collectors.toList());
@@ -61,21 +59,7 @@ public class FunctionCall extends Instruction {
         }
     }
 
-    public List<FunctionCallArgument> getArguments() {
-        return arguments;
-    }
-
     public Identifier getIdentifier() {
         return identifier;
-    }
-
-    private void argumentsExistInScope(Scope scope) {
-        boolean argumentsExistInScope = arguments
-                .stream()
-                .map(arg -> scope.containsIdentifier(arg.getIdentifier()))
-                .reduce(true, (a, b) -> a && b);
-
-        if (!argumentsExistInScope)
-            throw new RuntimeException("Error: could not find some of the arguments for function: " + identifier.getName());
     }
 }
