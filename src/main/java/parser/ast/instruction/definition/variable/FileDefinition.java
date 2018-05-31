@@ -33,6 +33,8 @@ public class FileDefinition extends VariableDefinition {
                         throw new RuntimeException("Error: Undefined attribute " + attribute.getName());
                 }
 
+                scope.addVariable(this.name, file);
+
                 return file;
             case CATALOGUE:
                 CatalogueVariable catalogue = new CatalogueVariable(scope);
@@ -54,6 +56,8 @@ public class FileDefinition extends VariableDefinition {
                             throw new RuntimeException("Error: Undefined attribute " + attribute.getName());
                     }
                 }
+
+                scope.addVariable(this.name, catalogue);
 
                 return catalogue;
             default:

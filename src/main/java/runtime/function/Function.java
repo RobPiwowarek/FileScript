@@ -35,8 +35,9 @@ public class Function {
             FunctionCallArgument argument = callArguments.get(i);
             Variable callArgument = argument.execute(scope);
 
-            if (type == callArgument.getType())
+            if (type == callArgument.getType()){
                 scope.updateVariable(argument.getIdentifier(), callArgument);
+            }
             else
                 throw new RuntimeException("Error: argument type mismatch. Expected: " + type + " found: " + callArgument.getType());
         }

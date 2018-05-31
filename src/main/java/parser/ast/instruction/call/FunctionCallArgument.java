@@ -6,18 +6,14 @@ import parser.ast.Node;
 import runtime.variable.Variable;
 
 public class FunctionCallArgument extends Node {
-    private Identifier identifier;
+    private Node argument;
 
     public FunctionCallArgument(Identifier identifier) {
-        this.identifier = identifier;
-    }
-
-    public String getIdentifier() {
-        return identifier.getName();
+        this.argument = identifier;
     }
 
     @Override
     public Variable execute(Scope scope) {
-        return identifier.execute(scope);
+        return argument.execute(scope);
     }
 }

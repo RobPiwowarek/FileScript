@@ -46,8 +46,10 @@ public class Parser {
 //            program.addInstruction(lastParsedInstruction);
 //        }
 
-      program.addInstruction(parseInstruction());
-      program.addInstruction(parseInstruction());
+        program.addInstruction(parseInstruction());
+        program.addInstruction(parseInstruction());
+        program.addInstruction(parseInstruction());
+        program.addInstruction(parseInstruction());
 
         return program;
     }
@@ -163,6 +165,8 @@ public class Parser {
                 return parseAssignment(identifier);
             case OPEN_BRACE:
                 return parseFunctionCall(identifier);
+            case PERIOD:
+                return parseAccess(identifier);
             default:
                 throw new RuntimeException(createErrorMessage(TokenType.COLON, TokenType.ASSIGN_OP, TokenType.OPEN_BRACE));
         }
@@ -273,11 +277,11 @@ public class Parser {
         return parseLogicalExpression();
     }
 
-    private Node parseAccess(Node from) throws Exception {
+    private Instruction parseAccess(Node from) throws Exception {
         accept(TokenType.PERIOD);
         Node identifier = parseIdentifierOrFunctionCallOrAccess();
 
-        Node fromAccess = new Access(from, identifier);
+        Instruction fromAccess = new Access(from, identifier);
 
         if (current.getType() == TokenType.PERIOD)
             return parseAccess(fromAccess);
@@ -448,7 +452,7 @@ public class Parser {
                     builder.append(current.getValue());
                     // todo: parse time
                     return new ConstDate();
-                } else{
+                } else {
                     accept(TokenType.CONST_INT);
                     return new ConstInt(Integer.parseInt(value));
                 }

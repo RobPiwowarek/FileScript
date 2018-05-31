@@ -3,12 +3,13 @@ package parser.ast.instruction.access;
 import parser.Scope;
 import parser.ast.Identifier;
 import parser.ast.Node;
+import parser.ast.instruction.Instruction;
 import parser.ast.instruction.call.FunctionCall;
 import runtime.variable.CatalogueVariable;
 import runtime.variable.FileVariable;
 import runtime.variable.Variable;
 
-public class Access extends Node {
+public class Access extends Instruction {
     private Node left;
     private Node right;
 
@@ -21,8 +22,9 @@ public class Access extends Node {
     public Variable execute(Scope scope) {
         FileVariable from = (FileVariable) left.execute(scope); // a moze byc zwrocony array variable i robimy tu access ewentualnie inna klasa na to
 
-        if (left instanceof Identifier) {
-            String memberName = ((Identifier) left).getName();
+        // todo: co jesli left jest Accessem?
+        if (right instanceof Identifier) {
+            String memberName = ((Identifier) right).getName();
 
             switch (memberName) {
                 case "subdirectories":
@@ -34,8 +36,10 @@ public class Access extends Node {
                 default:
                     throw new RuntimeException("Error. Attribute not yet supported or undefined");
             }
-        } else if (left instanceof FunctionCall) {
-            switch (((FunctionCall) left).getIdentifier().getName()) {
+        } else if (right instanceof FunctionCall) {
+            switch (((FunctionCall) right).getIdentifier().getName()) {
+                case "create":
+                    from.create();
                 case "copyTo":
                     break;
                 case "moveTo":
@@ -45,8 +49,6 @@ public class Access extends Node {
                 default:
                     throw new RuntimeException("Error. Method undefined");
             }
-        } else if (left instanceof Access) {
-
         } else
             throw new RuntimeException("Error. Expected Identifier, FunctionCall or Access as right side of Access operator");
 

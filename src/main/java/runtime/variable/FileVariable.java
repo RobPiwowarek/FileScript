@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 public class FileVariable extends Variable implements Schedulable {
@@ -21,6 +22,7 @@ public class FileVariable extends Variable implements Schedulable {
 
     public FileVariable(Scope scope) {
         this.scope = scope;
+        attributes = new HashMap<>();
     }
 
     public boolean open() {
@@ -38,6 +40,11 @@ public class FileVariable extends Variable implements Schedulable {
             attributes.replace("name", new StringVariable(name));
         else
             attributes.put("name", new StringVariable(name));
+
+        if (file == null)
+            file = new File(name);
+        else
+            file.renameTo(new File(name));
     }
 
     public void create() {
