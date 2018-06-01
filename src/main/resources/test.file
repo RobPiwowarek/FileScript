@@ -1,4 +1,8 @@
 val:int=5
-println(val)
+
+if ((2+3) == 5) {
+    println(val)
+}
+
 f:file={name:"dupa"}
 f.create()

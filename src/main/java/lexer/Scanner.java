@@ -94,6 +94,9 @@ public class Scanner {
                 token.append(source.nextChar());
         }
 
+        if (!source.isEoF())
+            source.nextChar();
+
         return new Token(TokenType.CONST_STRING, token.toString());
     }
 

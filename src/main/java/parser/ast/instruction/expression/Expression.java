@@ -39,14 +39,25 @@ public class Expression extends Node {
         Variable leftResult = left.execute(scope);
         Variable rightResult = right.execute(scope);
 
-        if (leftResult instanceof BoolVariable && rightResult instanceof BoolVariable)
-            return handleLogicalExpression((BoolVariable) leftResult, (BoolVariable) rightResult);
-        else if (leftResult instanceof IntegerVariable && rightResult instanceof IntegerVariable)
-            return handleArithmeticExpression((IntegerVariable) leftResult, (IntegerVariable) rightResult);
-        else if (leftResult instanceof Comparable && rightResult instanceof Comparable)
-            return handleRelationalExpression((Comparable) leftResult, (Comparable) rightResult);
-        else
-            throw new RuntimeException("Incomparable types");
+        switch (operator) {
+            case AND:
+            case OR:
+                return handleLogicalExpression((BoolVariable) leftResult, (BoolVariable) rightResult);
+            case PLUS:
+            case MINUS:
+            case MULTIPLY:
+            case DIVIDE:
+                return handleArithmeticExpression((IntegerVariable) leftResult, (IntegerVariable) rightResult);
+            case LESS:
+            case LESS_EQUAL:
+            case GREATER:
+            case GREATER_EQUAL:
+            case EQUAL:
+            case NOT_EQUAL:
+                return handleRelationalExpression((Comparable) leftResult, (Comparable) rightResult);
+            default:
+                throw new RuntimeException("Error. Incomparable types");
+        }
     }
 
     public Node getLeft() {

@@ -321,8 +321,9 @@ public class Parser {
         Node node = parseRelationalExpression();
 
         while (isAcceptable(TokenType.AND, TokenType.OR)) {
-            node = new Expression(node, current.getType(), parseRelationalExpression());
+            TokenType type = current.getType();
             accept(TokenType.AND, TokenType.OR);
+            node = new Expression(node, type, parseRelationalExpression());
         }
 
         return node;
@@ -335,11 +336,14 @@ public class Parser {
                 TokenType.LESS, TokenType.LESS_EQUAL,
                 TokenType.EQUAL, TokenType.NOT_EQUAL,
                 TokenType.GREATER, TokenType.GREATER_EQUAL)) {
-            node = new Expression(node, current.getType(), parseLowPriorityArithmeticExpression());
+
+            TokenType type = current.getType();
 
             accept(TokenType.LESS, TokenType.LESS_EQUAL,
                     TokenType.EQUAL, TokenType.NOT_EQUAL,
                     TokenType.GREATER, TokenType.GREATER_EQUAL);
+
+            node = new Expression(node, type, parseLowPriorityArithmeticExpression());
         }
 
         return node;
@@ -349,8 +353,9 @@ public class Parser {
         Node node = parseHighPriorityArithmeticExpression();
 
         while (isAcceptable(TokenType.PLUS, TokenType.MINUS)) {
-            node = new Expression(node, current.getType(), parseHighPriorityArithmeticExpression());
+            TokenType type = current.getType();
             accept(TokenType.PLUS, TokenType.MINUS);
+            node = new Expression(node, type, parseHighPriorityArithmeticExpression());
         }
 
         return node;
@@ -369,8 +374,9 @@ public class Parser {
         Node node = parseOperandOrExpression();
 
         while (isAcceptable(TokenType.MULTIPLY, TokenType.DIVIDE)) {
-            node = new Expression(node, current.getType(), parseOperandOrExpression());
+            TokenType type = current.getType();
             accept(TokenType.MULTIPLY, TokenType.DIVIDE);
+            node = new Expression(node, type, parseOperandOrExpression());
         }
         return node;
     }
