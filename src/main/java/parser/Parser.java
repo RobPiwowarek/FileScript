@@ -44,14 +44,9 @@ public class Parser {
 
         Instruction lastParsedInstruction;
 
-//        while ((lastParsedInstruction = parseInstruction()) != null && current.getType() != TokenType.EOF) {
-//            program.addInstruction(lastParsedInstruction);
-//        }
-
-        program.addInstruction(parseInstruction());
-        program.addInstruction(parseInstruction());
-        program.addInstruction(parseInstruction());
-        program.addInstruction(parseInstruction());
+        while (current.getType() != TokenType.EOF && (lastParsedInstruction = parseInstruction()) != null) {
+            program.addInstruction(lastParsedInstruction);
+        }
 
         return program;
     }
@@ -61,7 +56,7 @@ public class Parser {
             current = lexer.nextToken();
         else {
             final String errorMessage = createErrorMessage(types);
-            System.out.println(errorMessage);
+            System.err.println(errorMessage);
             throw new Exception(errorMessage);
         }
     }
@@ -85,7 +80,7 @@ public class Parser {
         return stringBuilder.toString();
     }
 
-    private Instruction parseInstruction() throws Exception {
+    private Instruction parseInstruction() {
         switch (current.getType()) {
             case DEF:
                 return parseFunctionDefinition();
@@ -102,75 +97,93 @@ public class Parser {
         }
     }
 
-    private Instruction parseFunctionDefinition() throws Exception {
-        accept(TokenType.DEF);
-        Identifier identifier = new Identifier(current.getValue());
-        accept(TokenType.IDENTIFIER);
-        List<FunctionArgument> arguments = parseFunctionArguments();
-        accept(TokenType.COLON);
-        Type returnType = parseType(current);
-        accept(TokenType.INT_TYPE, TokenType.BOOL_TYPE, TokenType.STRING_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
-        accept(TokenType.ASSIGN_OP);
+    private Instruction parseFunctionDefinition()  {
+        try {
+            accept(TokenType.DEF);
+            Identifier identifier = new Identifier(current.getValue());
+            accept(TokenType.IDENTIFIER);
+            List<FunctionArgument> arguments = parseFunctionArguments();
+            accept(TokenType.COLON);
+            Type returnType = parseType(current);
+            accept(TokenType.INT_TYPE, TokenType.BOOL_TYPE, TokenType.STRING_TYPE, TokenType.DATE_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
+            accept(TokenType.ASSIGN_OP);
 
-        Program body = parseInstructionBlock();
+            Program body = parseInstructionBlock();
 
-        return new FunctionDefinition(identifier, arguments, body, returnType);
-    }
-
-    private Instruction parseIf() throws Exception {
-        accept(TokenType.IF);
-        accept(TokenType.OPEN_BRACE);
-
-        Node expression = parseExpression();
-
-        accept(TokenType.CLOSED_BRACE);
-
-        Program body = parseInstructionBlock();
-
-        if (current.getType() == TokenType.ELSE) {
-            accept(TokenType.ELSE);
-            return new If(expression, body, new Else(parseInstructionBlock()));
+            return new FunctionDefinition(identifier, arguments, body, returnType);
+        } catch (Exception e) {
+            return null;
         }
-
-        return new If(expression, body, null);
     }
 
-    private Instruction parseForeach() throws Exception {
-        accept(TokenType.FOREACH);
+    private Instruction parseIf(){
+        try {
+            accept(TokenType.IF);
+            accept(TokenType.OPEN_BRACE);
 
-        Identifier iterator = new Identifier(current.getValue());
+            Node expression = parseExpression();
 
-        accept(TokenType.IDENTIFIER);
+            accept(TokenType.CLOSED_BRACE);
 
-        Identifier collection = new Identifier(current.getValue());
+            Program body = parseInstructionBlock();
 
-        accept(TokenType.IDENTIFIER);
+            if (current.getType() == TokenType.ELSE) {
+                accept(TokenType.ELSE);
+                return new If(expression, body, new Else(parseInstructionBlock()));
+            }
 
-        Program body = parseInstructionBlock();
-
-        return new Foreach(iterator, collection, body);
+            return new If(expression, body, null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    private Instruction parseReturn() throws Exception {
-        accept(TokenType.RETURN);
-        return new Return(parseExpression());
+    private Instruction parseForeach() {
+        try {
+            accept(TokenType.FOREACH);
+            Identifier iterator = new Identifier(current.getValue());
+
+            accept(TokenType.IDENTIFIER);
+
+            Identifier collection = new Identifier(current.getValue());
+
+            accept(TokenType.IDENTIFIER);
+
+            Program body = parseInstructionBlock();
+
+            return new Foreach(iterator, collection, body);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    private Instruction parseVariableDefinitionFunctionCallOrAssignment() throws Exception {
-        Identifier identifier = new Identifier(current.getValue());
-        accept(TokenType.IDENTIFIER);
+    private Instruction parseReturn() {
+        try {
+            accept(TokenType.RETURN);
+            return new Return(parseExpression());
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-        switch (current.getType()) {
-            case COLON:
-                return parseVariableDefinition(identifier);
-            case ASSIGN_OP:
-                return parseAssignment(identifier);
-            case OPEN_BRACE:
-                return parseFunctionCall(identifier);
-            case PERIOD:
-                return parseAccess(identifier);
-            default:
-                throw new RuntimeException(createErrorMessage(TokenType.COLON, TokenType.ASSIGN_OP, TokenType.OPEN_BRACE));
+    private Instruction parseVariableDefinitionFunctionCallOrAssignment() {
+        try {
+            Identifier identifier = new Identifier(current.getValue());
+            accept(TokenType.IDENTIFIER);
+            switch (current.getType()) {
+                case COLON:
+                    return parseVariableDefinition(identifier);
+                case ASSIGN_OP:
+                    return parseAssignment(identifier);
+                case OPEN_BRACE:
+                    return parseFunctionCall(identifier);
+                case PERIOD:
+                    return parseAccess(identifier);
+                default:
+                    throw new RuntimeException(createErrorMessage(TokenType.COLON, TokenType.ASSIGN_OP, TokenType.OPEN_BRACE));
+            }
+        } catch (Exception e) {
+            return null;
         }
     }
 
