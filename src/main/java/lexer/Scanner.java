@@ -35,7 +35,9 @@ public class Scanner {
                     currentChar = source.nextChar();
                 } while (Character.isWhitespace(currentChar));
 
-            if (Character.isDigit(currentChar) && currentChar != '0') // todo: a co z zerem jako liczba
+            if (currentChar == '0')
+                currentToken = new Token(TokenType.CONST_INT, "0");
+            else if (Character.isDigit(currentChar)) // todo: a co z zerem jako liczba
                 currentToken = processNumber(currentChar);
             else if (Character.isLetter(currentChar))
                 currentToken = processKeywordOrIdentifier(currentChar);

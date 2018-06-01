@@ -56,7 +56,7 @@ public class Expression extends Node {
             case NOT_EQUAL:
                 return handleRelationalExpression((Comparable) leftResult, (Comparable) rightResult);
             default:
-                throw new RuntimeException("Error. Incomparable types");
+                throw new RuntimeException("Error. Invalid operator");
         }
     }
 

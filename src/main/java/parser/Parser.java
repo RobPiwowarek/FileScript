@@ -210,6 +210,7 @@ public class Parser {
         }
     }
 
+    // todo access
     private Instruction parseArrayDefinition(Identifier identifier) throws Exception {
         accept(TokenType.OPEN_SQUARE_BRACE);
         int count = 0;
@@ -253,9 +254,8 @@ public class Parser {
     private Instruction parsePrimitiveDefinition(Identifier identifier) throws Exception {
         Type type = parseType(current);
         accept(TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.DATE_TYPE);
-        accept(TokenType.ASSIGN_OP);
 
-        return new PrimitiveDefinition(identifier.getName(), type, parseIdentifierOrConstValue());
+        return new PrimitiveDefinition(identifier.getName(), type, parseAssignment(identifier));
     }
 
     private Node parseIdentifierOrConstValue() throws Exception {
@@ -424,13 +424,7 @@ public class Parser {
 
             arguments.add(new FunctionArgument(parseType(current), identifier));
 
-            if (current.getType() == TokenType.COMMA)
-                accept(TokenType.COMMA);
-            else if (current.getType() == TokenType.CLOSED_BRACE) {
-                accept(TokenType.CLOSED_BRACE);
-                return arguments;
-            } else
-                accept(TokenType.COMMA, TokenType.CLOSED_BRACE);
+            if (parseEndOfArgumentsOrComma()) return arguments;
         }
         return arguments;
     }
@@ -443,25 +437,28 @@ public class Parser {
         while (current.getType() != TokenType.EOF) {
             Node arg;
 
-            if (current.getType() == TokenType.IDENTIFIER)
-                arg = parseIdentifierOrFunctionCallOrAccess();
-            else if (current.getType() == TokenType.CLOSED_BRACE) {
+            if (current.getType() == TokenType.CLOSED_BRACE) {
                 accept(TokenType.CLOSED_BRACE);
                 return arguments;
             } else
-                arg = parseConstValue();
+                arg = parseExpression();
 
             arguments.add(arg);
 
-            if (current.getType() == TokenType.COMMA)
-                accept(TokenType.COMMA);
-            else if (current.getType() == TokenType.CLOSED_BRACE) {
-                accept(TokenType.CLOSED_BRACE);
-                return arguments;
-            } else
-                accept(TokenType.COMMA, TokenType.CLOSED_BRACE);
+            if (parseEndOfArgumentsOrComma()) return arguments;
         }
         return arguments;
+    }
+
+    private boolean parseEndOfArgumentsOrComma() throws Exception {
+        if (current.getType() == TokenType.COMMA)
+            accept(TokenType.COMMA);
+        else if (current.getType() == TokenType.CLOSED_BRACE) {
+            accept(TokenType.CLOSED_BRACE);
+            return true;
+        } else
+            accept(TokenType.COMMA, TokenType.CLOSED_BRACE);
+        return false;
     }
 
     private Node parseConstValue() throws Exception {
