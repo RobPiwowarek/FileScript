@@ -1,3 +1,8 @@
+arr:[]int = [1,2,3]
+println(arr[2])
+
+println("------------------------------------------------------------")
+
 def funkcja():int = {
     println(69)
     return 0

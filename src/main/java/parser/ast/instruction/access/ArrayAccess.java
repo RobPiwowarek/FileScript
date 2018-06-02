@@ -2,9 +2,12 @@ package parser.ast.instruction.access;
 
 import parser.Scope;
 import parser.ast.Node;
+import parser.ast.instruction.Instruction;
+import runtime.variable.ArrayVariable;
+import runtime.variable.IntegerVariable;
 import runtime.variable.Variable;
 
-public class ArrayAccess extends Node {
+public class ArrayAccess extends Instruction {
     private Node from;
     private Node index;
 
@@ -13,8 +16,19 @@ public class ArrayAccess extends Node {
         this.index = index;
     }
 
+    public Node getIndex() {
+        return index;
+    }
+
+    public Node getFrom() {
+        return from;
+    }
+
     @Override
     public Variable execute(Scope scope) {
-        return null;
+        IntegerVariable evaluatedIndex = (IntegerVariable) index.execute(scope);
+        ArrayVariable evaluatedFrom = (ArrayVariable) from.execute(scope);
+
+        return evaluatedFrom.get(evaluatedIndex.getValue());
     }
 }

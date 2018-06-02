@@ -30,6 +30,8 @@ import parser.ast.instruction.value.ConstString;
 import java.util.ArrayList;
 import java.util.List;
 
+import static lexer.token.TokenType.*;
+
 public class Parser {
     private Scanner lexer;
     private Token current;
@@ -179,6 +181,8 @@ public class Parser {
                     return parseFunctionCall(identifier);
                 case PERIOD:
                     return parseAccess(identifier);
+                case OPEN_SQUARE_BRACE:
+                    return parseArrayAccess(identifier);
                 default:
                     throw new RuntimeException(createErrorMessage(TokenType.COLON, TokenType.ASSIGN_OP, TokenType.OPEN_BRACE));
             }
@@ -271,12 +275,17 @@ public class Parser {
 
     private ConstArray parseConstArray() throws Exception {
         accept(TokenType.OPEN_SQUARE_BRACE);
-        ArrayList<String> values = new ArrayList<>();
+        ArrayList<Node> values = new ArrayList<>();
 
         while (isAcceptable(TokenType.CONST_INT, TokenType.CONST_STRING, TokenType.CONST_BOOL)) {
-            values.add(current.getValue());
-            accept(TokenType.CONST_INT, TokenType.CONST_STRING, TokenType.CONST_BOOL);
-            accept(TokenType.COMMA);
+            values.add(parseConstValue());
+
+            if (current.getType() == COMMA)
+                accept(COMMA);
+            else if (current.getType() == TokenType.CLOSED_SQUARE_BRACE)
+                break;
+            else
+                accept(COMMA, CLOSED_SQUARE_BRACE);
         }
 
         accept(TokenType.CLOSED_SQUARE_BRACE);
@@ -304,14 +313,17 @@ public class Parser {
             return fromAccess;
     }
 
-    private Node parseArrayAccess(Node from) throws Exception {
+    private Instruction parseArrayAccess(Node from) throws Exception {
         accept(TokenType.OPEN_SQUARE_BRACE);
 
-        Node index = parseIdentifierOrFunctionCallOrAccess();
-        if (index == null)
-            index = parseConstValue();
+        Node index;
 
-        Node access = new ArrayAccess(from, index);
+        if (isAcceptable(CONST_INT))
+            index = parseConstValue();
+        else
+            index = parseIdentifierOrFunctionCallOrAccess();
+
+        Instruction access = new ArrayAccess(from, index);
 
         accept(TokenType.CLOSED_SQUARE_BRACE);
         return access;
@@ -405,6 +417,8 @@ public class Parser {
 
         if (current.getType() == TokenType.OPEN_BRACE)
             node = new FunctionCall(parseFunctionCallArguments(), identifier);
+        else if (current.getType() == OPEN_SQUARE_BRACE)
+            node = parseArrayAccess(identifier);
 
         if (current.getType() == TokenType.PERIOD)
             return parseAccess(node);
@@ -454,13 +468,13 @@ public class Parser {
     }
 
     private boolean parseEndOfArgumentsOrComma() throws Exception {
-        if (current.getType() == TokenType.COMMA)
-            accept(TokenType.COMMA);
+        if (current.getType() == COMMA)
+            accept(COMMA);
         else if (current.getType() == TokenType.CLOSED_BRACE) {
             accept(TokenType.CLOSED_BRACE);
             return true;
         } else
-            accept(TokenType.COMMA, TokenType.CLOSED_BRACE);
+            accept(COMMA, TokenType.CLOSED_BRACE);
         return false;
     }
 

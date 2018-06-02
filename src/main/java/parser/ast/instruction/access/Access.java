@@ -5,9 +5,7 @@ import parser.ast.Identifier;
 import parser.ast.Node;
 import parser.ast.instruction.Instruction;
 import parser.ast.instruction.call.FunctionCall;
-import runtime.variable.CatalogueVariable;
-import runtime.variable.FileVariable;
-import runtime.variable.Variable;
+import runtime.variable.*;
 
 public class Access extends Instruction {
     private Node left;
@@ -49,9 +47,24 @@ public class Access extends Instruction {
                 default:
                     throw new RuntimeException("Error. Method undefined");
             }
+        } else if (right instanceof ArrayAccess) {
+            Node accessFrom = ((ArrayAccess) right).getFrom();
+            if (accessFrom instanceof Identifier) {
+                switch (((Identifier) accessFrom).getName()) {
+                    case "subdirectories":
+                        return ((CatalogueVariable) from).getSubdirectories().get(((IntegerVariable) ((ArrayAccess) right).getIndex().execute(scope)).getValue());
+                    case "files":
+                        return ((CatalogueVariable) from).getFiles().get(((IntegerVariable) ((ArrayAccess) right).getIndex().execute(scope)).getValue());
+                    default:
+                        throw new RuntimeException("Error. Member " + ((Identifier) accessFrom).getName() + " undefined.");
+                }
+            } else if (accessFrom instanceof FunctionCall) {
+                throw new RuntimeException("NYI Exception");
+            } else
+                throw new RuntimeException("Error. Expected Identifier or FunctionCall as ArrayAccess from");
         } else
             throw new RuntimeException("Error. Expected Identifier, FunctionCall or Access as right side of Access operator");
 
-        return null;
+        return VoidVariable.getInstance();
     }
 }
