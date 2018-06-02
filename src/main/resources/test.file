@@ -1,5 +1,7 @@
 arr:[]int = [1,2,3]
-println(arr[2])
+println(arr[0])
+arr.add(0, 69)
+println(arr[0])
 
 println("------------------------------------------------------------")
 

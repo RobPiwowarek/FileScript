@@ -21,6 +21,10 @@ public class FunctionCall extends Instruction {
         this.identifier = identifier;
     }
 
+    public List<Node> getArguments() {
+        return arguments;
+    }
+
     @Override
     public Variable execute(Scope scope) {
         if (scope.containsFunction(identifier.getName())) {
