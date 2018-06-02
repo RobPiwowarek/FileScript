@@ -47,7 +47,7 @@ public class Expression extends Node {
             case MINUS:
             case MULTIPLY:
             case DIVIDE:
-                return handleArithmeticExpression((IntegerVariable) leftResult, (IntegerVariable) rightResult);
+                return handleArithmeticExpression(leftResult, rightResult);
             case LESS:
             case LESS_EQUAL:
             case GREATER:
@@ -72,16 +72,16 @@ public class Expression extends Node {
         return right;
     }
 
-    private Variable handleArithmeticExpression(IntegerVariable leftResult, IntegerVariable rightResult) {
+    private Variable handleArithmeticExpression(Variable leftResult, Variable rightResult) {
         switch (operator) {
             case PLUS:
                 return CommonOperations.add(leftResult, rightResult);
             case MINUS:
-                return CommonOperations.subtract(leftResult, rightResult);
+                return CommonOperations.subtract((IntegerVariable)leftResult, (IntegerVariable) rightResult);
             case MULTIPLY:
-                return CommonOperations.multiply(leftResult, rightResult);
+                return CommonOperations.multiply((IntegerVariable)leftResult, (IntegerVariable)rightResult);
             case DIVIDE:
-                return CommonOperations.divide(leftResult, rightResult);
+                return CommonOperations.divide((IntegerVariable)leftResult, (IntegerVariable)rightResult);
             default:
                 throw new RuntimeException("Unexpected operator in expression " + operator);
         }

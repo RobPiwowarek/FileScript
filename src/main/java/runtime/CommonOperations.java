@@ -1,7 +1,9 @@
 package runtime;
 
+import parser.ast.Type;
 import runtime.variable.BoolVariable;
 import runtime.variable.IntegerVariable;
+import runtime.variable.StringVariable;
 import runtime.variable.Variable;
 
 public abstract class CommonOperations {
@@ -39,8 +41,24 @@ public abstract class CommonOperations {
         return new BoolVariable(a.getValue() || b.getValue());
     }
 
-    public static IntegerVariable add(IntegerVariable a, IntegerVariable b) {
+    private static IntegerVariable add(IntegerVariable a, IntegerVariable b) {
         return new IntegerVariable(a.getValue() + b.getValue());
+    }
+
+    private static StringVariable add(StringVariable a, Variable b) {
+        if (b instanceof IntegerVariable)
+            return new StringVariable(a.getValue().append(String.valueOf(((IntegerVariable) b).getValue())).toString());
+        else if (b instanceof BoolVariable)
+            return new StringVariable(a.getValue().append(String.valueOf(((BoolVariable) b).getValue())).toString());
+        else
+            return new StringVariable(a.getValue().append(((StringVariable) b).getValue()).toString());
+    }
+
+    public static Variable add(Variable a, Variable b){
+        if (a.getType() == Type.STRING)
+            return add((StringVariable) a, b);
+        else
+            return add((IntegerVariable) a, (IntegerVariable) b);
     }
 
     public static IntegerVariable subtract(IntegerVariable a, IntegerVariable b) {

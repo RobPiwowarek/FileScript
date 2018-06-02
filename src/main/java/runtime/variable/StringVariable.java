@@ -13,6 +13,10 @@ public class StringVariable extends Variable {
         value.append(string);
     }
 
+    public StringBuilder getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return value.toString();
