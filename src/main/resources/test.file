@@ -1,5 +1,32 @@
-println(a / 0)
+def funkcja():int = {
+    println(69)
+    return 0
+}
 
+result:int = funkcja()
+println("result:")
+println(result)
+
+println("------------------------------------------------------------")
+
+def funkcja2(aba:int):int = {
+    aba = aba + 1
+    return aba
+}
+
+println(funkcja2(1))
+
+println("------------------------------------------------------------")
+
+def funkcja3(aba:int, baba:string):int = {
+    aba = aba + aba
+    println(baba)
+    return aba
+}
+
+println(funkcja3(1, "dupa"))
+
+println("------------------------------------------------------------")
 
 val:int=5
 
@@ -33,3 +60,4 @@ println(a + b * 3)
 
 f:file={name:"dupa"}
 f.create()
+

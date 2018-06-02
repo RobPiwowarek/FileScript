@@ -28,7 +28,11 @@ public class Assignment extends Instruction {
     @Override
     public Variable execute(Scope scope) {
         Variable result = expression.execute(scope);
-        scope.addVariable(identifier.getName(), result);
+        if (scope.containsVariable(identifier.getName()))
+            scope.updateVariable(identifier.getName(), result);
+        else
+            scope.addVariable(identifier.getName(), result);
+
         return VoidVariable.getInstance();
     }
 }

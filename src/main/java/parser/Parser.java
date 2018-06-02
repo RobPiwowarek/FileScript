@@ -417,12 +417,15 @@ public class Parser {
 
         accept(TokenType.OPEN_BRACE);
 
-        while (current.getType() == TokenType.IDENTIFIER) {
-            String identifier = current.getValue();
-            accept(TokenType.IDENTIFIER);
-            accept(TokenType.COLON);
-
-            arguments.add(new FunctionArgument(parseType(current), identifier));
+        while (current.getType() != TokenType.EOF) {
+            if (current.getType() == TokenType.IDENTIFIER) {
+                String identifier = current.getValue();
+                accept(TokenType.IDENTIFIER);
+                accept(TokenType.COLON);
+                Type type = parseType(current);
+                accept(TokenType.INT_TYPE, TokenType.STRING_TYPE, TokenType.BOOL_TYPE, TokenType.FILE_TYPE, TokenType.CATALOGUE_TYPE);
+                arguments.add(new FunctionArgument(type, identifier));
+            }
 
             if (parseEndOfArgumentsOrComma()) return arguments;
         }

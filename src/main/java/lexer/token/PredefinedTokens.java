@@ -58,6 +58,6 @@ public class PredefinedTokens {
         public static final Token ELSE = new Token(TokenType.ELSE, "else");
         public static final Token FOREACH = new Token(TokenType.FOREACH, "foreach");
         public static final Token RETURN = new Token(TokenType.RETURN, "return");
-        public static final Token DEF = new Token(TokenType.EMPTY, "def");
+        public static final Token DEF = new Token(TokenType.DEF, "def");
     }
 }
