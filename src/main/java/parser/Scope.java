@@ -33,6 +33,10 @@ public class Scope {
         }
     }
 
+    public void removeVariable(final String identifier) {
+        variables.remove(identifier);
+    }
+
     public void updateVariable(final String identifier, Variable newValue) {
         variables.replace(identifier, newValue);
     }

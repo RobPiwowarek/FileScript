@@ -42,6 +42,12 @@ public class Access extends Instruction {
                             return VoidVariable.getInstance();
                         } else
                             throw new RuntimeException("Error. Too many arguments for function array get");
+                    case "set":
+                        if (args.size() == 2) {
+                            ((ArrayVariable) from).set(((IntegerVariable) args.get(0)).getValue(), args.get(1));
+                            return VoidVariable.getInstance();
+                        } else
+                            throw new RuntimeException("Error. Too many arguments for function array set");
                     default:
                         throw new RuntimeException("Error. Undefined function");
                 }
@@ -65,10 +71,20 @@ public class Access extends Instruction {
                 switch (((FunctionCall) right).getIdentifier().getName()) {
                     case "create":
                         ((FileVariable) from).create();
+                        break;
                     case "copyTo":
-                        break;
+                        if (((FunctionCall) right).getArguments().size() > 1)
+                            throw new RuntimeException("Error. Too many arguments for function moveTo");
+
+                        Variable arg = ((FunctionCall) right).getArguments().stream().map(x -> x.execute(scope)).findFirst().orElseGet(VoidVariable::getInstance);
+                        return ((FileVariable) from).copyTo(arg);
                     case "moveTo":
-                        break;
+                        if (((FunctionCall) right).getArguments().size() > 1)
+                            throw new RuntimeException("Error. Too many arguments for function moveTo");
+
+                        Variable argu = ((FunctionCall) right).getArguments().stream().map(x -> x.execute(scope)).findFirst().orElseGet(VoidVariable::getInstance);
+
+                        return ((FileVariable) from).moveTo(argu);
                     case "delete":
                         break;
                     default:

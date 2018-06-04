@@ -4,6 +4,7 @@ import parser.Program;
 import parser.Scope;
 import parser.ast.Identifier;
 import parser.ast.instruction.Instruction;
+import runtime.variable.ArrayVariable;
 import runtime.variable.Variable;
 import runtime.variable.VoidVariable;
 
@@ -33,7 +34,16 @@ public class Foreach extends Instruction {
 
     @Override
     public Variable execute(Scope scope) {
-        body.executeInstructions(scope);
+        ArrayVariable array = (ArrayVariable) collection.execute(scope);
+        scope.addVariable(iterator.getName(), VoidVariable.getInstance());
+
+        for (Variable variable : array.getArray()) {
+            scope.updateVariable(iterator.getName(), variable);
+            body.executeInstructions(scope);
+        }
+
+        scope.removeVariable(iterator.getName());
+        
         return VoidVariable.getInstance();
     }
 }

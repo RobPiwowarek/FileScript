@@ -56,11 +56,37 @@ public class FileVariable extends Variable implements Schedulable {
         }
     }
 
-    public boolean rename(String newName) {
-        return file.renameTo(new File(newName));
+    private boolean moveTo(String destination) {
+        try {
+            Files.move(file.toPath(), Paths.get(destination));
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public boolean copyTo(String destination) {
+    public IntegerVariable moveTo(Variable destination) {
+        if (destination instanceof StringVariable){
+            return moveTo(((StringVariable) destination).getValue().toString()) ? new IntegerVariable(0) : new IntegerVariable(1);
+        } else if (destination instanceof CatalogueVariable) {
+            return moveTo(((CatalogueVariable) destination).name) ? new IntegerVariable(0) : new IntegerVariable(1);
+        } else {
+            throw new RuntimeException("Invalid argument type for function moveTo. Expected String or Catalogue");
+        }
+    }
+
+    public IntegerVariable copyTo(Variable destination) {
+        if (destination instanceof StringVariable){
+            return copyTo(((StringVariable) destination).getValue().toString()) ? new IntegerVariable(0) : new IntegerVariable(1);
+        } else if (destination instanceof CatalogueVariable) {
+            return copyTo(((CatalogueVariable) destination).name) ? new IntegerVariable(0) : new IntegerVariable(1);
+        } else {
+            throw new RuntimeException("Invalid argument type for function copyTo. Expected String or Catalogue");
+        }
+    }
+
+    private boolean copyTo(String destination) {
         try {
             Files.copy(file.toPath(), Paths.get(destination));
             return true;

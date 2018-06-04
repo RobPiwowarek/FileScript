@@ -147,6 +147,8 @@ public class Parser {
 
             accept(TokenType.IDENTIFIER);
 
+            accept(COLON);
+
             Identifier collection = new Identifier(current.getValue());
 
             accept(TokenType.IDENTIFIER);

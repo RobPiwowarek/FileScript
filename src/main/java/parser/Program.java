@@ -15,6 +15,10 @@ public class Program {
         body.add(instruction);
     }
 
+    public List<Instruction> getBody() {
+        return body;
+    }
+
     public Variable executeInstructions(Scope scope) {
         for (Instruction instruction : body) {
             Variable result = instruction.execute(scope);

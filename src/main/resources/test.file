@@ -1,8 +1,15 @@
 arr:[]int = [1,2,3]
 println(arr[0])
-arr.add(0, 69)
+arr.set(2, 69)
 println(arr[0])
 println("lubie" + " " + "kielbase o numerze: " + arr.get(0))
+
+println("------------------------------------------------------------")
+println("foreach: ")
+
+foreach abc: arr {
+    println(" " + abc)
+}
 
 println("------------------------------------------------------------")
 
@@ -66,6 +73,10 @@ println(a < b)
 println(a > b)
 println(a + b * 3)
 
-f:file={name:"dupa"}
+f:file={name:"src/dupa"}
 f.create()
 
+z:catalogue={name:"testCatalogue"}
+z.create()
+
+f.copyTo(z.name + "/" + f.name)
