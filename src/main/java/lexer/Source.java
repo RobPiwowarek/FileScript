@@ -21,7 +21,7 @@ class Source {
 
                 charCounter = 1;
 
-                getNextChar();
+                currentChar = nextChar;
             } else {
                 ++charCounter;
 

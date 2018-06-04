@@ -86,7 +86,8 @@ public class Access extends Instruction {
 
                         return ((FileVariable) from).moveTo(argu);
                     case "delete":
-                        break;
+                        ((FileVariable) from).delete();
+                        return VoidVariable.getInstance();
                     default:
                         throw new RuntimeException("Error. Method undefined");
                 }

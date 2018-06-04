@@ -1,5 +1,6 @@
 package runtime.variable;
 
+import org.apache.commons.io.FileUtils;
 import parser.Program;
 import parser.Scope;
 import parser.ast.Type;
@@ -58,7 +59,7 @@ public class FileVariable extends Variable implements Schedulable {
 
     private boolean moveTo(String destination) {
         try {
-            Files.move(file.toPath(), Paths.get(destination));
+            FileUtils.moveFileToDirectory(file, new File(destination), true);
             return true;
         } catch (Exception e){
             e.printStackTrace();
@@ -88,11 +89,19 @@ public class FileVariable extends Variable implements Schedulable {
 
     private boolean copyTo(String destination) {
         try {
-            Files.copy(file.toPath(), Paths.get(destination));
+            FileUtils.copyToDirectory(file, new File(destination));
             return true;
         } catch (IOException e) {
             e.printStackTrace(); // todo:
             return false;
+        }
+    }
+
+    public void delete() {
+        try {
+            FileUtils.forceDelete(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
