@@ -89,6 +89,11 @@ public class Scanner {
     private Token processString(char currentChar) throws EmptySourceException{
         StringBuilder token = new StringBuilder();
 
+        if (currentChar == '\"' && source.peek() == '\"') {
+            source.nextChar();
+            return new Token(TokenType.CONST_STRING, "");
+        }
+
         while (!source.isEoF()) {
             if ((source.peek() == '\"' && token.charAt(token.length() - 1) != '\\'))
                 break;

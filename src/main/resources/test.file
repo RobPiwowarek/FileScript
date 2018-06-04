@@ -1,14 +1,14 @@
 arr:[]int = [1,2,3]
-println(arr[0])
+println(arr[2])
 arr.set(2, 69)
-println(arr[0])
+println(arr[2])
 println("lubie" + " " + "kielbase o numerze: " + arr.get(0))
 
 println("------------------------------------------------------------")
 println("foreach: ")
 
 foreach abc: arr {
-    println(" " + abc)
+    println("" + abc)
 }
 
 println("------------------------------------------------------------")
