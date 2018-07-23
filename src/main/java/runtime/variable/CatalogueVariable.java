@@ -9,13 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CatalogueVariable extends FileVariable implements Schedulable {
-    private ArrayVariable subdirectories;
-    private ArrayVariable files;
 
     public CatalogueVariable(Scope scope) {
         super(scope);
-        subdirectories = new ArrayVariable(Type.CATALOGUE);
-        files = new ArrayVariable(Type.FILE);
+        subdirectories = new ArrayVariable();
+        files = new ArrayVariable();
     }
 
     public ArrayVariable getSubdirectories() {

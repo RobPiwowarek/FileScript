@@ -5,6 +5,7 @@ import parser.Program;
 import parser.Scope;
 import parser.ast.Type;
 import runtime.Schedulable;
+import runtime.function.Function;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,15 +16,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileVariable extends Variable implements Schedulable {
-    protected String name;
     protected Program updateBody;
     protected Map<String, Variable> attributes;
+    protected Map<String, Function> functions;
     protected File file;
     protected Scope scope;
 
     public FileVariable(Scope scope) {
         this.scope = scope;
         attributes = new HashMap<>();
+        functions = new HashMap<>();
+
+
     }
 
     public boolean open() {
@@ -35,19 +39,6 @@ public class FileVariable extends Variable implements Schedulable {
         return true;
     }
 
-    public void setName(String name) {
-        this.name = name;
-        if (attributes.containsKey("name"))
-            attributes.replace("name", new StringVariable(name));
-        else
-            attributes.put("name", new StringVariable(name));
-
-        if (file == null)
-            file = new File(name);
-        else
-            file.renameTo(new File(name));
-    }
-
     public void create() {
         try {
             if (!file.exists())
@@ -57,6 +48,7 @@ public class FileVariable extends Variable implements Schedulable {
         }
     }
 
+    // todo: to remove
     private boolean moveTo(String destination) {
         try {
             FileUtils.moveFileToDirectory(file, new File(destination), true);

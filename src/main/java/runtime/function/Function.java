@@ -12,7 +12,7 @@ import runtime.variable.VoidVariable;
 
 import java.util.List;
 
-public class Function {
+public abstract class Function {
     private Program body;
     private Scope scope;
     private List<FunctionArgument> arguments;
