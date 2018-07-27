@@ -130,7 +130,7 @@ Errors - fatal
 
 +++ 
 
-<img src="pics/lexical analysis.jpg" style="height:75vh">
+<img src="pics/lexical analysis.png" style="height:75vh">
 
 +++
 Lexer changes chars into tokens  
