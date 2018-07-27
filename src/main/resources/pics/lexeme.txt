@@ -1,0 +1,1 @@
+A lexeme can be thought of as a uniquely identifiable string of characters in the source programming language, for example, keywords such as if, while or func, identifiers, strings, numbers, operators or single characters like (, ), . or :.
