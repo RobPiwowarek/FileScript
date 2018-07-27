@@ -4,6 +4,6 @@ rpw@touk.pl
 
 ---
 
-### Idea
+### 
 
-![Idea](pics/idea.png)
+?image=pics/idea.png&size=auto 90%)
