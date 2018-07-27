@@ -8,9 +8,6 @@ import runtime.Schedulable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,7 +86,7 @@ public class FileVariable extends Variable implements Schedulable {
 
     private boolean copyTo(String destination) {
         try {
-            FileUtils.copyToDirectory(file, new File(destination));
+            FileUtils.copyFileToDirectory(file, new File(destination));
             return true;
         } catch (IOException e) {
             e.printStackTrace(); // todo:

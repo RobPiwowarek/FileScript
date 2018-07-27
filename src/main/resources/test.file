@@ -72,26 +72,6 @@ println(a != b)
 println(a < b)
 println(a > b)
 println(a + b * 3)
+println(((((a + b) + 2) * 5) + 1 - 10 * 6) * 3)
 
-f:file={name:"dupa"}
-f.create()
-
-z:catalogue={name:"testCatalogue"}
-z.create()
-
-f.copyTo(z.name + "/" + f.name)
-z.copyTo("testowe")
-
-z.delete()
-f.delete()
-
-g:catalogue={name:"testowe"}
-
-subdirs:[]catalogue = g.subdirectories
-
-foreach subdir : subdirs {
-    println(subdir.name)
-}
-
-g.delete()
 
