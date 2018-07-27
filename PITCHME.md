@@ -1,15 +1,9 @@
 # Writing your own first interpreter
 
-Writing your own first interpreter
+rpw@touk.pl
 
 ---
 
-### Flux Design
+### Idea
 
-- Dispatcher: Manages Data Flow
-- Stores: Handle State & Logic
-- Views: Render Data via React
-
----
-
-![Flux Explained](https://facebook.github.io/flux/img/flux-simple-f8-diagram-explained-1300w.png)
+![Flux Explained](https://github.com/RobPiwowarek/FileScript/blob/presentation2/pics/idea.png)
