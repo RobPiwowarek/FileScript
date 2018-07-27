@@ -118,7 +118,13 @@ Errors - fatal
 
 ---
 ### Lexer
-Changes chars into tokens  
+
++++ 
+
+<img src="pics/lexical analysis.jpg" style="height:75vh">
+
++++
+Lexer changes chars into tokens  
 But what is a good token candidate?  
 
 +++
@@ -189,3 +195,42 @@ foreach = "foreach" '('identifier ":" identifier')' instructionBlock
 ```
 
 +++?code=src/main/java/lexer/token/TokenType.java&lang=java
+
+---
+### Parser
+
++++
+<img src="pics/syntax analysis.png" style="height:75vh">
+
++++
+### Types
+RD, SLR, LR, LL ... many more
+
++++
+### LL
+Simpler, easier to give out helpful errors, smaller parser table than LR
+
++++
+<img src="pics/LL.png" style="height:75vh">
+
++++
+<img src="pics/LL-table.png" style="height:75vh">
+
++++
+### LR
+harder to implement manually, more generic than LL
+
++++
+<img src="pics/compiler_phases.jpg" style="height:75vh">
+
++++
+### RD
+the chosen one
+
++++
+very easy to implement
+
+---
+
+### Abstract Syntax Tree
+<img src="pics/ast.png" style="height:75vh">
