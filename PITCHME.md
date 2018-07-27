@@ -27,3 +27,5 @@ keywords ("if", "while" etc), identifiers, strings...
 ### Lets start with the language
 
 ---
+### EBNF - Language to define language 
+![Ebnf]pics/ebnf.png
