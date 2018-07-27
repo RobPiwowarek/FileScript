@@ -60,11 +60,14 @@ if (true && true) {
     println(9)
 }
 
+println("------------------------------------------------------------")
+
 dupa:bool = (2+5)*3 == 2+3*12
 println(dupa)
 
 a:int = (2+5)*3
 b:int = 2+3*12
+
 println(a)
 println(b)
 println(a == b)

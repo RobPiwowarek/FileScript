@@ -27,6 +27,15 @@ keywords ("if", "while" etc), identifiers, strings...
 ### Lets start with the language
 
 ---
+<img src="pics/chomsky.png" style="height:75vh">
+
+---
+1. regular – finite state automata
+2. context-free – pushdown automata
+3. context-sensitive – „linear bounded nondeterministic Turing machine„
+4. recursively enumerable – turing machine
+
+---
 ### EBNF - Language to define languages
 ![Logo](pics/ebnf.png)
 
@@ -221,7 +230,7 @@ Simpler, easier to give out helpful errors, smaller parser table than LR
 harder to implement manually, more generic than LL
 
 +++
-<img src="pics/compiler_phases.jpg" style="height:75vh">
+<img src="pics/lr.jpg" style="height:75vh">
 
 +++
 ### RD
