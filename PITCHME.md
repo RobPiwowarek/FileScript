@@ -18,6 +18,7 @@ rpw@touk.pl
 token = object describing a lexeme
 lexeme = uniquely identifiable sequence of characters like keywords ("if", "while" etc), identifiers, strings...
 
+---
 ### So you want to write your first interpreter?
 
 ### Lets start with the language
