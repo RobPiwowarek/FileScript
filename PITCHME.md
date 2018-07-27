@@ -2,5 +2,4 @@
 
 rpw@touk.pl
 
----
----?image=pics/idea.png&size=auto 90%)
+---?image=pics/idea.png&size=auto 50%)
