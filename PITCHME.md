@@ -2,4 +2,5 @@
 
 rpw@touk.pl
 
----?image=pics/idea.png&size=w 50% h 50%)
+---
+<img src="pics/idea.png" style="height:75vh">
