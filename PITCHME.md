@@ -27,7 +27,7 @@ keywords ("if", "while" etc), identifiers, strings...
 ### Lets start with the language
 
 ---
-### EBNF - Language to define language 
+### EBNF - Language to define languages
 ![Logo](pics/ebnf.png)
 
 ---
@@ -234,3 +234,4 @@ very easy to implement
 
 ### Abstract Syntax Tree
 <img src="pics/ast.png" style="height:75vh">
+
