@@ -11,7 +11,7 @@ rpw@touk.pl
 ---
 <img src="pics/compiler_phases.jpg" style="height:75vh">
 
----
++++
 <img src="pics/compiler_phases_2.jpg" style="height:75vh">
 
 ---
