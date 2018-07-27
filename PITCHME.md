@@ -188,5 +188,4 @@ if = "if" '('expression')' instructionBlock ["else" instructionBlock]
 foreach = "foreach" '('identifier ":" identifier')' instructionBlock
 ```
 
-+++
----?code=src/main/java/lexer/token/TokenType.java&lang=java
++++?code=src/main/java/lexer/token/TokenType.java&lang=java
